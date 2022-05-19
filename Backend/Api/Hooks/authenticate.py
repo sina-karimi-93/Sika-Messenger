@@ -22,8 +22,8 @@ class Authenticate:
 
         try:
             is_match = ApiTools.check_password(
-                user_credential['password'],
-                user['password']
+                user_credential.get('password'),
+                user.get('password')
             )
             if is_match:
                 req.is_auth = True

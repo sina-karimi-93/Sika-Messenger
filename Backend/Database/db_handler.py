@@ -172,8 +172,8 @@ class Database:
             delete_one -> bool
         """
         if delete_one:
-            return self.collection.delete_one(query)
-        self.collection.delete_many(query)
+            return self.collection.delete_one(query).deleted_count
+        self.collection.delete_many(query).deleted_count
 
     @_change_collection
     def aggregate(self, piplines: list, collection_name: str = None) -> CursorType:

@@ -98,3 +98,34 @@ class Users:
             "status": "error",
             "message": "User credential is not valid!"
         }
+
+    @falcon.before(Authenticate())
+    def on_delete(self, req: falcon.Request, resp: falcon.Response) -> None:
+        """
+        This method removes a user from database. First via hooks it checks
+        user credential and if valid it will remove the user from database.
+        """
+
+        if req.is_auth:
+
+            with Database(HOST, PORT, DB_NAME, 'users') as db:
+
+                db: Database
+
+                deleted_count = db.delete_record({"email": req.user['email']})
+
+            if deleted_count == 1:
+                resp.media = {
+                    "status": "ok",
+                    "message": "The user has been successfully deleted."
+                }
+                return
+            resp.media = {
+                "status": "error",
+                "message": "Something went wrong. Couldn't remove the user."
+            }
+            return
+        resp.media = {
+            "status": "error",
+            "message": "User credential is not valid."
+        }

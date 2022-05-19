@@ -20,7 +20,7 @@ class Users:
         return a valid response for authentication and the user data.
         """
 
-        if req.is_auth == True:
+        if req.is_auth:
             user = ApiTools.prepare_data_before_send(req.user)
             resp.media = {
                 "status": "ok",
@@ -32,11 +32,12 @@ class Users:
                 "status": "error",
                 "message": "Wrong password."
             }
-        else:
-            resp.media = {
-                "status": "error",
-                "message": "User does not exists."
-            }
+            return
+
+        resp.media = {
+            "status": "error",
+            "message": "User does not exists."
+        }
 
     @falcon.before(CheckUserExists())
     def on_post_signup(self, req: falcon.Request, resp: falcon.Response):

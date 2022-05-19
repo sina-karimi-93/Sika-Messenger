@@ -1,6 +1,7 @@
 from functools import wraps
-from pymongo import CursorType, MongoClient
+from pymongo import MongoClient
 from bson.objectid import ObjectId
+from pymongo.cursor import Cursor
 
 
 class Database:
@@ -87,7 +88,7 @@ class Database:
                    projection: dict = {},
                    find_one=True,
                    collection_name: str = None,
-                   ) -> dict or CursorType:
+                   ) -> dict or Cursor:
         """
         This method gets a criteria as a dict and search in database for
         data.
@@ -176,7 +177,7 @@ class Database:
         self.collection.delete_many(query).deleted_count
 
     @_change_collection
-    def aggregate(self, piplines: list, collection_name: str = None) -> CursorType:
+    def aggregate(self, piplines: list, collection_name: str = None) -> Cursor:
         """
         This method is execute aggregation framework pipelines.
         """

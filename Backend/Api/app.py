@@ -6,3 +6,4 @@ app = falcon.App()
 
 
 app.add_route("/users/login", Users(), suffix="login")
+app.add_route("/users/signup", Users(), suffix="signup")

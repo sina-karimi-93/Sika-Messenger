@@ -113,8 +113,8 @@ class Database:
         """
 
         if isinstance(data, dict):
-            return self.collection.insert_one(data)
-        return self.collection.insert_many(data)
+            return self.collection.insert_one(data).inserted_id
+        return self.collection.insert_many(data).inserted_ids
 
     @_change_collection
     def update_record(self,

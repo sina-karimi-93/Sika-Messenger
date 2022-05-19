@@ -43,7 +43,7 @@ class Database:
             raise ValueError("There is not desired collection!")
         self._collection = self.db[value]
 
-    def _change_collection(self, func: object, collection_name) -> None:
+    def _change_collection(func: object) -> None:
         """
         This is a decorator function which other functions add this
         function as a decorator.
@@ -51,15 +51,15 @@ class Database:
         here we change the self.collection.
         """
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(self, *args, **kwargs):
             """
             There we check if new collection_name exists, replace it with
             previous collection_name.
             """
-            if kwargs['collection_name']:
+            if kwargs.get('collection_name'):
                 self.collection = kwargs['collection_name']
-                return func(*args, **kwargs)
-            return func(*args, **kwargs)
+                return func(self, *args, **kwargs)
+            return func(self, *args, **kwargs)
         return wrapper
 
     def __enter__(self) -> None:

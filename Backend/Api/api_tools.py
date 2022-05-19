@@ -1,10 +1,22 @@
 import base64
-from urllib import request
+import bcrypt
+import json
+from bson import json_util
 
 
 class ApiTools:
 
     """"""
+
+    @staticmethod
+    def prepare_data_before_send(data: list or dict) -> dict:
+        """
+        This method prepare data for responding through http methods.
+        Via json_utils tools it convert data to proper shape.
+        """
+        reshape_fields = json_util.dumps(data)
+        serialized_data = json.loads(reshape_fields)
+        return serialized_data
 
     @staticmethod
     def extract_auth_data(auth_data: str) -> dict:
@@ -22,7 +34,29 @@ class ApiTools:
         auth_type, auth_data = auth_data.split(' ')
         reshape = base64.b64decode(auth_data).decode("utf-8")
         user_credential = {
-            "username": reshape.split(":")[0],
+            "email": reshape.split(":")[0],
             "password": reshape.split(":")[1],
         }
         return user_credential
+
+    @staticmethod
+    def encode_password(password: str) -> str:
+        """
+        This function hash passwords and return them as string to 
+        store them in database.
+        """
+
+        hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+        return hashed_password.decode()
+
+    def check_password(password: str, encoded_password: str) -> bool:
+        """
+        This method check whether a password is match to existing or not.
+
+        args:
+            password -> input password from client
+            encoded_password -> existing password in database
+        """
+
+        is_match = bcrypt.checkpw(password.encode(), encoded_password.encode())
+        return is_match

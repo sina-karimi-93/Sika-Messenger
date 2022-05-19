@@ -1,0 +1,176 @@
+[
+    {
+        "_id": {
+            "$oid": "62865df926772d1facf9fadd"
+        },
+        "name": "Sina Karimi",
+        "email": "sina@gmail.com",
+        "password": "$2b$12$jtYJ2Zalog4flrmay6/NcO5Opn8RXOU5feim3A54l1jAghk5IcEC6",
+        "phone_number": 989150000000,
+        "create_date": {
+            "$date": "2022-05-19T20:13:20.895Z"
+        },
+        "profile_pictures": [],
+        "chats": [
+            {
+                "$oid": "6286627326772d1facf9fae9"
+            },
+            {
+                "$oid": "6286627326772d1facf9faea"
+            },
+            {
+                "$oid": "6286627326772d1facf9faeb"
+            },
+            {
+                "$oid": "6286627326772d1facf9faec"
+            }
+        ],
+        "groups": [],
+        "channels": []
+    },
+    {
+        "_id": {
+            "$oid": "62865df926772d1facf9fade"
+        },
+        "name": "Ali Karimi",
+        "email": "ali@gmail.com",
+        "password": "$2b$12$hYt7nlqhNxaSj5gNQI3N3emqewBXdwKhTzD.8JW70sDZop/bYHyqq",
+        "phone_number": 989160000000,
+        "create_date": {
+            "$date": "2022-05-19T20:13:21.088Z"
+        },
+        "profile_pictures": [],
+        "chats": [
+            {
+                "$oid": "6286627326772d1facf9fae9"
+            }
+        ],
+        "groups": [],
+        "channels": []
+    },
+    {
+        "_id": {
+            "$oid": "62865df926772d1facf9fadf"
+        },
+        "name": "Mohammad Karimi",
+        "email": "mohammad@gmail.com",
+        "password": "$2b$12$jm/c3mOrFqas0/dAxIYQN.1EoyoaZHkWdHI6ZgvVJTHVNTjmJfYkW",
+        "phone_number": 989170000000,
+        "create_date": {
+            "$date": "2022-05-19T20:13:21.281Z"
+        },
+        "profile_pictures": [],
+        "chats": [
+            {
+                "$oid": "6286627326772d1facf9faea"
+            }
+        ],
+        "groups": [],
+        "channels": []
+    },
+    {
+        "_id": {
+            "$oid": "62865df926772d1facf9fae0"
+        },
+        "name": "Hadi Karimi",
+        "email": "hadi@gmail.com",
+        "password": "$2b$12$rB801TekOgkH2N73XCTrw.a7/CGMhWs4J76lsteKlexuQax//wEKW",
+        "phone_number": 989150000000,
+        "create_date": {
+            "$date": "2022-05-19T20:13:21.476Z"
+        },
+        "profile_pictures": [],
+        "chats": [
+            {
+                "$oid": "6286627326772d1facf9faeb"
+            }
+        ],
+        "groups": [],
+        "channels": []
+    },
+    {
+        "_id": {
+            "$oid": "62865df926772d1facf9fae1"
+        },
+        "name": "Zeinab Ebrahimi",
+        "email": "zeinab@gmail.com",
+        "password": "$2b$12$GC5t63CM36d0dZKfgpvQC.VsYTSIaqIx6JKXZjQ/i93TRR1RYdkmy",
+        "phone_number": 989180000000,
+        "create_date": {
+            "$date": "2022-05-19T20:13:21.671Z"
+        },
+        "profile_pictures": [],
+        "chats": [
+            {
+                "$oid": "6286627326772d1facf9faec"
+            }
+        ],
+        "groups": [],
+        "channels": []
+    },
+    {
+        "name": "Reza Hejazi",
+        "email": "reza@gmail.com",
+        "password": "$2b$12$3g80KZOW8o5bEeoIovWSyeyF1hBM4gLa0d332RkGOokeJEuoOm03S",
+        "phone_number": 989190000000,
+        "create_date": {
+            "$date": "2022-05-19T20:13:21.864Z"
+        },
+        "profile_pictures": [],
+        "chats": [],
+        "groups": [],
+        "channels": []
+    },
+    {
+        "name": "Mohammad Tavakoli",
+        "email": "mohammad@gmail.com",
+        "password": "$2b$12$YSgMzjyrTMv4P.BaIb9jFOMFTODuwd5Mg6Tb7tMrHorV9Psmkp7Rq",
+        "phone_number": 989200000000,
+        "create_date": {
+            "$date": "2022-05-19T20:13:22.058Z"
+        },
+        "profile_pictures": [],
+        "chats": [],
+        "groups": [],
+        "channels": []
+    },
+    {
+        "name": "Sed Morteza Hossein",
+        "email": "morteza@gmail.com",
+        "password": "$2b$12$SF3EOOejZg41ni.wsJlTnedUT/tliFfCCP8ia3VEXRO2dtzMqMc02",
+        "phone_number": 989210000000,
+        "create_date": {
+            "$date": "2022-05-19T20:13:22.252Z"
+        },
+        "profile_pictures": [],
+        "chats": [],
+        "groups": [],
+        "channels": []
+    },
+    {
+        "name": "Sina Karimi",
+        "email": "sina@gmail.com",
+        "password": "$2b$12$b/2b4CdW4Q/1nIh/ESQCXOZGNgIC4Rdo4V2F2C56KdYR.1xz8D46.",
+        "phone_number": 989220000000,
+        "create_date": {
+            "$date": "2022-05-19T20:13:22.445Z"
+        },
+        "profile_pictures": [],
+        "chats": [],
+        "groups": [],
+        "channels": []
+    },
+    {
+        "name": "Farhad Karimi",
+        "email": "farhad@gmail.com",
+        "password": "$2b$12$ILHLlLUHA/XWhdYps7gtTOBQ6mAZPDOgl9vqcvCxY.fKgku6aum1.",
+        "phone_number": 989230000000,
+        "create_date": {
+            "$date": "2022-05-19T20:13:22.642Z"
+        },
+        "profile_pictures": [],
+        "chats": [],
+        "groups": [],
+        "channels": []
+    }
+]

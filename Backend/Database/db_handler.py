@@ -50,6 +50,7 @@ class Database:
         For each operation if the collection have to be changed
         here we change the self.collection.
         """
+
         @wraps(func)
         def wrapper(self, *args, **kwargs):
             """
@@ -122,7 +123,7 @@ class Database:
                       updated_data: dict,
                       update_one: bool = True,
                       collection_name: str = None,
-                      ) -> None:
+                      ) -> int:
         """
         This method update a document or part of it. First by query 
         database find the desire document and with updated_data, update
@@ -134,9 +135,10 @@ class Database:
             collection_name -> str
             update_one -> bool
         """
+        print(collection_name)
         if update_one:
-            return self.collection.update_one(query, updated_data)
-        return self.collection.update_many(query, updated_data)
+            return self.collection.update_one(query, updated_data).matched_count
+        return self.collection.update_many(query, updated_data).acknowledged
 
     @_change_collection
     def replace_record(self,

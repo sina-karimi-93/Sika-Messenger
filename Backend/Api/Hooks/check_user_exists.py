@@ -12,11 +12,12 @@ class CheckUserExists:
 
     def __call__(self, req, resp, resource, params) -> None:
         """"""
-        new_user = ApiTools.prepare_body_data(req)
+        new_user = ApiTools.prepare_body_data(req.stream.read())
         with Database(HOST, PORT, DB_NAME, "users") as db:
             db: Database
 
-            user = db.get_record({"email": new_user["email"]})
+            user = db.get_record(
+                {"email": new_user["email"]}, collection_name='users')
         if user:
             req.is_user_exists = True
         else:

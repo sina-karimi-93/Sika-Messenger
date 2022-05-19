@@ -19,14 +19,13 @@ class ApiTools:
         return serialized_data
 
     @staticmethod
-    def prepare_body_data(request) -> dict or list:
+    def prepare_body_data(data) -> dict or list:
         """
         This function prepare and reshape the data which came from
         a post http method. First it read the data through request.stream.read(), 
         then decode it with utf-8. Finallyturn it to python dict with 
         json_utils.loads() and return it.
         """
-        data = request.stream.read()
         data = data.decode("utf-8")
         data = json_util.loads(data)
         return data

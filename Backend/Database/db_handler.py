@@ -1,5 +1,6 @@
 from functools import wraps
 from pymongo import CursorType, MongoClient
+from bson.objectid import ObjectId
 
 
 class Database:
@@ -85,7 +86,7 @@ class Database:
                    projection: dict = {},
                    find_one=True,
                    collection_name: str = None,
-                   ) -> dict or list:
+                   ) -> dict or CursorType:
         """
         This method gets a criteria as a dict and search in database for
         data.
@@ -101,7 +102,7 @@ class Database:
     def insert_record(self,
                       data: dict or list,
                       collection_name: str = None,
-                      ) -> str:
+                      ) -> ObjectId or list:
         """
         This method gets a dictionary or list and based on its type
         insert it into database, If instance is dict then we use insert_one

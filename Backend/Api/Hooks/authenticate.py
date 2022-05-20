@@ -1,5 +1,5 @@
 
-
+import falcon
 from Api.api_tools import ApiTools
 from Database.db_handler import Database
 
@@ -26,10 +26,13 @@ class Authenticate:
                 user.get('password')
             )
             if is_match:
-                req.is_auth = True
                 req.user = user
-            else:
-                req.is_auth = False
-        except TypeError as e:
+                return
+
+            raise falcon.HTTPUnauthorized(title='error',
+                                          description="Username and Password are not matched")
+        except (AttributeError, TypeError) as e:
+            print(e)
             # This code runs when a user does not exists.
-            req.is_auth = -1
+            raise falcon.HTTPNotFound(
+                title='error', description='User is not exists')

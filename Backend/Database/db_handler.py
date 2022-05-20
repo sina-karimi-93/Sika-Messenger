@@ -138,7 +138,7 @@ class Database:
         """
         if update_one:
             return self.collection.update_one(query, updated_data).matched_count
-        return self.collection.update_many(query, updated_data).acknowledged
+        return self.collection.update_many(query, updated_data).matched_count
 
     @_change_collection
     def replace_record(self,

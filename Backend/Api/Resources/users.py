@@ -3,7 +3,7 @@ from pprint import pprint
 from datetime import datetime
 from Database.db_handler import Database
 from Api.api_tools import ApiTools
-from Api.Hooks.check_user_exists import CheckUserExists
+from Api.Hooks.signup_check_user_exists import SignupCheckUserExists
 from Api.Hooks.authenticate import Authenticate
 
 HOST = 'localhost'
@@ -19,27 +19,14 @@ class Users:
         This method checks the user credential and if valid
         return a valid response for authentication and the user data.
         """
-
-        if req.is_auth:
-            user = ApiTools.prepare_data_before_send(req.user)
-            resp.media = {
-                "status": "ok",
-                "message": "User is authenticated and can login.",
-                "user": user
-            }
-        elif req.is_auth == False:
-            resp.media = {
-                "status": "error",
-                "message": "Wrong password."
-            }
-            return
-
+        user = ApiTools.prepare_data_before_send(req.user)
         resp.media = {
-            "status": "error",
-            "message": "User does not exists."
+            "title": "ok",
+            "description": "User is authenticated and can login.",
+            "user": user
         }
 
-    @falcon.before(CheckUserExists())
+    @falcon.before(SignupCheckUserExists())
     def on_post_signup(self, req: falcon.Request, resp: falcon.Response):
         """
         This method is stands for creating new user. With a hook first 
@@ -47,22 +34,23 @@ class Users:
         create new user with dedicated data.
         """
 
-        if req.is_user_exists:
-            resp.media = {
-                "status": "error",
-                "message": "A user with this email is currently exists"
-            }
-        else:
-            req.user['create_date'] = datetime.now()
-            with Database(HOST, PORT, DB_NAME, 'users') as db:
-                db: Database
+        req.user['create_date'] = datetime.now()
+        req.user['password'] = ApiTools.encode_password(req.user['password'])
+        with Database(HOST, PORT, DB_NAME, 'users') as db:
+            db: Database
 
-                user_id = db.insert_record(req.user)
+            user_id = db.insert_record(req.user)
+        if user_id:
             resp.media = {
-                "staus": "ok",
-                "message": "User successfully registered",
+                "title": "ok",
+                "description": "User successfully registered",
                 "user_id": ApiTools.prepare_data_before_send(user_id)
             }
+            return
+        resp.media = {
+            "title": "error",
+            "description": "Something went wrong! Couldn't create new user!",
+        }
 
     @falcon.before(Authenticate())
     def on_patch_edit(self, req: falcon.Request, resp: falcon.Response) -> None:
@@ -72,32 +60,25 @@ class Users:
         matched it will update the user.
         """
 
-        if req.is_auth:
+        updated_fields = ApiTools.prepare_body_data(data=req.stream.read())
 
-            updated_fields = ApiTools.prepare_body_data(data=req.stream.read())
+        with Database(HOST, PORT, DB_NAME, 'users') as db:
+            db: Database
 
-            with Database(HOST, PORT, DB_NAME, 'users') as db:
-                db: Database
-
-                matched_account = db.update_record(
-                    query={"email": req.user["email"]},
-                    updated_data={"$set": updated_fields},
-                )
-            if matched_account:
-                resp.media = {
-                    "status": "ok",
-                    "message": "Desired document successfully updated"
-                }
-                return
-            # Couldn't find desired document or field
+            matched_account = db.update_record(
+                query={"email": req.user["email"]},
+                updated_data={"$set": updated_fields},
+            )
+        if matched_account:
             resp.media = {
-                "status": "error",
-                "message": "Something went wrong! Couldn't update"
+                "status": "ok",
+                "message": "Desired document successfully updated"
             }
             return
+        # Couldn't find desired document or field
         resp.media = {
             "status": "error",
-            "message": "User credential is not valid!"
+            "message": "Something went wrong! Couldn't update"
         }
 
     @falcon.before(Authenticate())
@@ -106,27 +87,19 @@ class Users:
         This method removes a user from database. First via hooks it checks
         user credential and if valid it will remove the user from database.
         """
+        with Database(HOST, PORT, DB_NAME, 'users') as db:
 
-        if req.is_auth:
+            db: Database
 
-            with Database(HOST, PORT, DB_NAME, 'users') as db:
+            deleted_count = db.delete_record({"email": req.user['email']})
 
-                db: Database
-
-                deleted_count = db.delete_record({"email": req.user['email']})
-
-            if deleted_count == 1:
-                resp.media = {
-                    "status": "ok",
-                    "message": "The user has been successfully deleted."
-                }
-                return
+        if deleted_count == 1:
             resp.media = {
-                "status": "error",
-                "message": "Something went wrong. Couldn't remove the user."
+                "status": "ok",
+                "message": "The user has been successfully deleted."
             }
             return
         resp.media = {
             "status": "error",
-            "message": "User credential is not valid."
+            "message": "Something went wrong. Couldn't remove the user."
         }

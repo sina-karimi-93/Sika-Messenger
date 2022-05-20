@@ -95,11 +95,11 @@ class Users:
 
         if deleted_count == 1:
             resp.media = {
-                "status": "ok",
-                "message": "The user has been successfully deleted."
+                "title": "ok",
+                "description": "The user has been successfully deleted."
             }
             return
         resp.media = {
-            "status": "error",
-            "message": "Something went wrong. Couldn't remove the user."
+            "title": "error",
+            "description": "Something went wrong. Couldn't remove the user."
         }

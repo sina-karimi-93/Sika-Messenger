@@ -2,6 +2,8 @@ import base64
 import bcrypt
 import json
 from bson import json_util
+from datetime import datetime
+from bson.objectid import ObjectId
 
 
 class ApiTools:
@@ -72,3 +74,69 @@ class ApiTools:
 
         is_match = bcrypt.checkpw(password.encode(), encoded_password.encode())
         return is_match
+
+    def create_new_chat(self, chat_data: dict) -> dict:
+        """
+        This method creates a dictionary which contains a chat
+        information based on database chats collection schema.
+
+        args:
+            chat_data -> dict:
+                {
+                    "message":"Some message",
+                    "owner": {"$oid":"Some Id"},
+                    "receiver":{"$oid":"Some Id"}
+                }
+
+        return -> dict
+        """
+        date = datetime.now()
+        new_chat_document = {
+            "owners": [chat_data["owner"], chat_data["receiver"]],
+            "create_date": date,
+            "messages": [
+                {
+                    "_id": ObjectId(),
+                    "message": chat_data['message'],
+                    "owner":chat_data['owner'],
+                    "create_date":date
+                }
+            ]
+        }
+        return new_chat_document
+
+    def create_new_group(group_data: dict) -> dict:
+        """
+        This method creates a dictionary which contains a group
+        information based on database group collection schema.
+
+        args:
+            group_data -> dict:
+                {
+                    "group_name":"Some Name",
+                    "owner": {"$oid":"Some Id"},
+                }
+
+        return -> dict
+        """
+        new_group_document = {
+            **group_data,
+            "create_date": datetime.now(),
+            "messages": [],
+            "admins": [],
+            "members": []
+        }
+
+        return new_group_document
+
+    def check_user_authorization(user_id: ObjectId, room: dict, just_owner=False) -> bool:
+        """
+        This method checks whether the user is owner or admin of a
+        group/channel or not.
+        """
+        if user_id == room['owner']:
+            return True
+        if just_owner == False:
+            if user_id in room['admins']:
+                return True
+        return False

@@ -32,6 +32,13 @@ class Chats:
                 find_one=False,
             ).sort('create_date', pymongo.DESCENDING))
 
+        if len(user_chats) < 1:
+            resp.media = {
+                "title": "error",
+                "description": "User has not any groups."
+            }
+            return
+
         user_chats = ApiTools.prepare_data_before_send(user_chats)
 
         resp.media = {
@@ -39,36 +46,6 @@ class Chats:
             "description": "Chats are in descending order.",
             "chats": user_chats
         }
-
-    def _create_new_chat(self, chat_data: dict) -> dict:
-        """
-        This method creates a dictionary which contains a chat
-        information based on database chats collection schema.
-
-        args:
-            chat_data -> dict:
-                {
-                    "message":"Some message",
-                    "owner": {"$oid":"Some Id"},
-                    "receiver":{"$oid":"Some Id"}
-                }
-
-        return -> dict
-        """
-        date = datetime.now()
-        new_chat_document = {
-            "owners": [chat_data["owner"], chat_data["receiver"]],
-            "create_date": date,
-            "messages": [
-                {
-                    "_id": ObjectId(),
-                    "message": chat_data['message'],
-                    "owner":chat_data['owner'],
-                    "create_date":date
-                }
-            ]
-        }
-        return new_chat_document
 
     @falcon.before(Authenticate())
     def on_post(self, req: falcon.Request, resp: falcon.Response) -> None:
@@ -81,7 +58,7 @@ class Chats:
 
         # preparing chat data for making new chat document in database
         chat_data = ApiTools.prepare_body_data(req.stream.read())
-        new_chat_document = self._create_new_chat(chat_data)
+        new_chat_document = ApiTools.create_new_chat(chat_data)
 
         with Database(HOST, PORT, DB_NAME, 'chats') as db:
             db: Database

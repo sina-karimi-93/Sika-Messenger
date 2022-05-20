@@ -136,7 +136,6 @@ class Database:
             collection_name -> str
             update_one -> bool
         """
-        print(collection_name)
         if update_one:
             return self.collection.update_one(query, updated_data).matched_count
         return self.collection.update_many(query, updated_data).acknowledged

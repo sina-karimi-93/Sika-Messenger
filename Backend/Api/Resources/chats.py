@@ -1,3 +1,4 @@
+from bson import ObjectId
 import falcon
 from pprint import pprint
 from datetime import datetime
@@ -46,3 +47,43 @@ class Chats:
             "status": "error",
             "message": "User credential is not valid."
         }
+
+    @falcon.before(Authenticate())
+    def on_post_new_message(self, req: falcon.Request, resp: falcon.Response, chat_id: str) -> None:
+        """
+        This method adds new message to ane existin chat.
+        """
+        if req.is_auth:
+            message_data = ApiTools.prepare_body_data(req.stream.read())
+            message_data['create_date'] = datetime.now()
+            with Database(HOST, PORT, DB_NAME, 'chats') as db:
+                db: Database
+
+                match_count = db.update_record(
+                    query={"_id": ObjectId(chat_id)},
+                    updated_data={"$push": {"messages": message_data}}
+                )
+            print(match_count)
+            if match_count:
+                resp.media = {
+                    "status": "ok",
+                    "message": "Message successfully added"
+                }
+                return
+            resp.media = {
+                "status": "error",
+                "message": "Something went wrong"
+            }
+            return
+        resp.media = {
+            "status": "error",
+            "message": "User Credential is not valid"
+        }
+
+    # @falcon.before(Authenticate())
+    # def on_patch_update_message(self, req: falcon.Request, resp: falcon.Response) -> None:
+    #     """"""
+
+    # @falcon.before(Authenticate())
+    # def on_post_new_chat(self, req: falcon.Request, resp: falcon.Response) -> None:
+    #     """"""

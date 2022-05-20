@@ -14,3 +14,4 @@ app.add_route("/user/delete", Users())
 
 
 app.add_route("/user/chats", Chats())
+app.add_route("/user/chats/{chat_id}", Chats(), suffix='new_message')

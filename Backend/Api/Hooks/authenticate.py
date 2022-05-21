@@ -3,6 +3,7 @@ import falcon
 from Api.api_tools import ApiTools
 from Database.db_handler import Database
 
+
 HOST = 'localhost'
 PORT = 27017
 DB_NAME = 'sika-messenger'
@@ -10,12 +11,17 @@ DB_NAME = 'sika-messenger'
 
 class Authenticate:
 
-    def __call__(self, req, resp, resource, params) -> None:
-        """
-        This magic method checks user credential.
-        """
-        user_credential = ApiTools.extract_auth_data(req.auth)
+    """
+    This class is a hook object for api routes. In __call__ method
+    it checks whether the user is exists or not. Then if exists, it
+    checks user credential and if everything is ok, it returns the user
+    data through request object to the route.
+    """
 
+    def __call__(self, req, resp, resource, params) -> None:
+
+        print("Authenticate")
+        user_credential = ApiTools.extract_auth_data(req.auth)
         with Database(HOST, PORT, DB_NAME, 'users') as db:
             db: Database
             user = db.get_record({"email": user_credential['email']})

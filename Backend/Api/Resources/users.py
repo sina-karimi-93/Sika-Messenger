@@ -13,6 +13,9 @@ DB_NAME = 'sika-messenger'
 
 class Users:
 
+    def __str__(self) -> str:
+        return "Users"
+
     @falcon.before(Authenticate())
     def on_post_login(self, req: falcon.Request, resp: falcon.Response):
         """

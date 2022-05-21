@@ -1,9 +1,11 @@
 import falcon
 import pymongo
 from datetime import datetime
+from pprint import pprint
 from bson.objectid import ObjectId
 from Api.api_tools import ApiTools
 from Api.Hooks.authenticate import Authenticate
+from Api.Hooks.authorize import Authorize
 from Database.db_handler import Database
 
 HOST = 'localhost'
@@ -12,6 +14,9 @@ DB_NAME = 'sika-messenger'
 
 
 class Groups:
+
+    def __str__(self) -> str:
+        return "Groups"
 
     @falcon.before(Authenticate())
     def on_get(self, req: falcon.Request, resp: falcon.Response) -> None:
@@ -49,105 +54,139 @@ class Groups:
         It creates new group document.Then it will insert it to the database and
         receives the group id(new document id). Finally, it add this group id to
         user group array(which contains user groups ids).
+
+        Request body:
+            {
+                "group_name" : "...",
+                "owner" : {"$oid":"..."},
+            }
+
         """
 
         # preparing group data for making new group document in database
-        new_group_data = ApiTools.prepare_body_data(req.stream.read())
-        new_group_data = ApiTools.create_new_group(new_group_data)
-
+        body = ApiTools.prepare_body_data(req.stream.read())
+        new_group_data = ApiTools.create_new_group(body)
+        pprint(new_group_data)
         with Database(HOST, PORT, DB_NAME, 'groups') as db:
             db: Database
-            # Insert new group document to chat collection
+
+            # Insert new group document to groups collection
             group_id = db.insert_record(new_group_data)
+
             # Insert created group id to user groups array.
-            matched_count = db.update_record(
+            db.update_record(
                 query={"_id": ObjectId(req.user['_id'])},
                 updated_data={
                     "$push": {"groups": ObjectId(group_id)}
                 },
                 collection_name='users'
             )
-        if matched_count == 1:
-            resp.media = {
-                "title": "ok",
-                "description": "New group has been successfully created.",
-                "group_id": ApiTools.prepare_data_before_send(ObjectId(group_id))
-            }
-            return
+
         resp.media = {
-            "title": "error",
-            "description": "Something went wrong!"
+            "title": "ok",
+            "description": "New group has been successfully created.",
+            "group_id": ApiTools.prepare_data_before_send(ObjectId(group_id))
         }
 
     @falcon.before(Authenticate())
+    @falcon.before(Authorize())
+    def on_delete(self, req: falcon.Request, resp: falcon.Response) -> None:
+        """
+        This method removes a group.
+        """
+        group = req.room
+        all_members = [req.user["_id"], *group["admins"], *group["members"]]
+        if req.is_owner:
+            with Database(HOST, PORT, DB_NAME, 'users') as db:
+                db: Database
+                # Remove group id from all users who has this group id in their groups array
+                db.update_record(
+                    query={"_id": {"$in": all_members}},
+                    updated_data={"$pull": {"groups": group["_id"]}},
+                    update_one=False,
+                )
+                # remove group from groups collection
+                db.delete_record(
+                    query={"_id": group["_id"]},
+                    collection_name='groups')
+                resp.media = {
+                    "title": "ok",
+                    "description": "Group has been successfully deleted."
+                }
+                return
+        resp.media = {
+            "title": "ok",
+            "description": "You are not the owner of the group."
+        }
+
+    @falcon.before(Authenticate())
+    @falcon.before(Authorize())
     def on_patch_add_member(self, req: falcon.Request, resp: falcon.Response) -> None:
         """
         This method adds new member to the group.
         After authentication if user is owner or one of admins, he/she can
         add new member to the group.
-        """
 
-        new_member_data = ApiTools.prepare_body_data(req.stream.read())
-        # Check whether the applicant is owner or admin of the group or not
+        Request body:
+            {
+                "room_id" : {"$oid": "..."},
+                "new_member_id : {"$oid": "..."}
+            }
+        """
+        body = req.body_data
+        group = req.room
         with Database(HOST, PORT, DB_NAME, 'groups') as db:
             db: Database
 
-            group = db.get_record({"_id": new_member_data['group_id']})
+            # Insert new member to group members
+            db.update_record(
+                query={"_id": group["_id"]},
+                updated_data={
+                    "$push": {"members": body["new_member_id"]}}
+            )
 
-            is_authorize = ApiTools.check_user_authorization(
-                req.user["_id"], group)
-
-            if is_authorize:
-
-                db.update_record(
-                    query={"_id": group["_id"]},
-                    updated_data={
-                        "$push": {"members": new_member_data["new_member_id"]}}
-                )
-                db.update_record(
-                    query={"_id": new_member_data['new_member_id']},
-                    updated_data={
-                        "$push": {"groups": group["_id"]}},
-                    collection_name='users'
-                )
-                resp.media = {
-                    "title": "ok",
-                    "description": "New member has been successfully added to the group."
-                }
-                return
-
-            resp.media = {
-                "title": "error",
-                "description": "User has not authorization to add new member."
-            }
+            # Insert group id to user groups
+            db.update_record(
+                query={"_id": body['new_member_id']},
+                updated_data={
+                    "$push": {"groups": group["_id"]}},
+                collection_name='users'
+            )
+        resp.media = {
+            "title": "ok",
+            "description": "New member has been successfully added to the group."
+        }
 
     @falcon.before(Authenticate())
+    @falcon.before(Authorize())
     def on_patch_add_admin(self, req: falcon.Request, resp: falcon.Response) -> None:
         """
         This method change the authorization of a member to admin in a group.
+
+        Request body:
+            {
+                "room_id" : {"$oid": "..."},
+                "new_admin_id : {"$oid": "..."}
+            }
         """
-        new_admin_data = ApiTools.prepare_body_data(req.stream.read())
+        body = req.body_data
+        group = req.room
         # Check whether the applicant is owner of the group or not
-        with Database(HOST, PORT, DB_NAME, 'groups') as db:
-            db: Database
+        if req.is_owner:
+            with Database(HOST, PORT, DB_NAME, 'groups') as db:
+                db: Database
 
-            group = db.get_record({"_id": new_admin_data['group_id']})
-
-            is_authorize = ApiTools.check_user_authorization(
-                req.user["_id"], group, just_owner=True)
-
-            if is_authorize:
                 # Remove member from group members
                 db.update_record(
                     query={"_id": group["_id"]},
                     updated_data={
-                        "$pull": {"members": new_admin_data["new_admin_id"]}}
+                        "$pull": {"members": body["new_admin_id"]}}
                 )
                 # Add member to group admins
                 db.update_record(
                     query={"_id": group["_id"]},
                     updated_data={
-                        "$push": {"admins": new_admin_data["new_admin_id"]}}
+                        "$push": {"admins": body["new_admin_id"]}}
                 )
                 resp.media = {
                     "title": "ok",
@@ -160,32 +199,35 @@ class Groups:
         }
 
     @falcon.before(Authenticate())
+    @falcon.before(Authorize())
     def on_patch_remove_admin(self, req: falcon.Request, resp: falcon.Response) -> None:
         """
         This method change the authorization of a member to admin in a group.
+        Request body:
+            {
+                "room_id" : {"$oid": "..."},
+                "admin_id : {"$oid": "..."}
+            }
         """
-        new_admin_data = ApiTools.prepare_body_data(req.stream.read())
-        # Check whether the applicant is owner of the group or not
-        with Database(HOST, PORT, DB_NAME, 'groups') as db:
-            db: Database
+        body = req.body_data
+        group = req.room
 
-            group = db.get_record({"_id": new_admin_data['group_id']})
+        if req.is_owner:
+            # Check whether the applicant is owner of the group or not
+            with Database(HOST, PORT, DB_NAME, 'groups') as db:
+                db: Database
 
-            is_authorize = ApiTools.check_user_authorization(
-                req.user["_id"], group, just_owner=True)
-
-            if is_authorize:
                 # Add member to group members
                 db.update_record(
                     query={"_id": group["_id"]},
                     updated_data={
-                        "$push": {"members": new_admin_data["new_admin_id"]}}
+                        "$push": {"members": body["admin_id"]}}
                 )
                 # Remove admin from group admins
                 db.update_record(
                     query={"_id": group["_id"]},
                     updated_data={
-                        "$pull": {"admins": new_admin_data["new_admin_id"]}}
+                        "$pull": {"admins": body["admin_id"]}}
                 )
                 resp.media = {
                     "title": "ok",
@@ -195,30 +237,4 @@ class Groups:
         resp.media = {
             "title": "ok",
             "description": "You are not the owner of the group"
-        }
-
-    @falcon.before(Authenticate())
-    def on_delete(self, req: falcon.Request, resp: falcon.Response, group_id: str) -> None:
-        """
-        This method removes a group.
-        """
-        with Database(HOST, PORT, DB_NAME, 'groups') as db:
-            db: Database
-
-            group = db.get_record({"_id": ObjectId(group_id)})
-
-            is_authorize = ApiTools.check_user_authorization(
-                req.user["_id"], group, just_owner=True)
-
-            if is_authorize:
-                db.delete_record({"_id": ObjectId(group_id)})
-
-                resp.media = {
-                    "title": "ok",
-                    "description": "Group has been successfully deleted."
-                }
-                return
-        resp.media = {
-            "title": "ok",
-            "description": "You are not the owner of the group."
         }

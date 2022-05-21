@@ -20,7 +20,6 @@ app.add_route("/user/chats/{chat_id}/{message_id}",
               Chats(), suffix='update_message')
 
 app.add_route("/user/groups", Groups())  # user groups
-app.add_route("/user/groups/{group_id}", Groups())  # remove group
 app.add_route("/user/groups/add-member", Groups(), suffix="add_member")
 app.add_route("/user/groups/add-admin", Groups(), suffix="add_admin")
 app.add_route("/user/groups/remove-admin", Groups(), suffix="remove_admin")

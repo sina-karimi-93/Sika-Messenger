@@ -15,6 +15,9 @@ DB_NAME = 'sika-messenger'
 
 class Chats:
 
+    def __str__(self) -> str:
+        return "Chats"
+
     @falcon.before(Authenticate())
     def on_get(self, req: falcon.Request, resp: falcon.Response) -> None:
         """

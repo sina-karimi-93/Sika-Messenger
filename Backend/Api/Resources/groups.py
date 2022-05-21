@@ -65,7 +65,8 @@ class Groups:
 
         # preparing group data for making new group document in database
         body = ApiTools.prepare_body_data(req.stream.read())
-        new_group_data = ApiTools.create_new_group(body)
+        new_group_data = ApiTools.create_new_group(
+            name=body["group_name"], owner=req.user["_id"])
         pprint(new_group_data)
         with Database(HOST, PORT, DB_NAME, 'groups') as db:
             db: Database
@@ -237,4 +238,36 @@ class Groups:
         resp.media = {
             "title": "ok",
             "description": "You are not the owner of the group"
+        }
+
+    @falcon.before(Authenticate())
+    def on_post_new_message(self, req: falcon.Request, resp: falcon.Response) -> None:
+        """
+        This route adds new message to the group.
+
+        Request body {
+            room_id : {"$oid" : "..."},
+            message : "...",
+        }
+        """
+
+        body = ApiTools.prepare_body_data(req.stream.read())
+        new_message_data = {
+            "_id": ObjectId(),
+            "message": body["message"],
+            "owner": req.user["_id"],
+            "create_date": datetime.now(),
+        }
+
+        with Database(HOST, PORT, DB_NAME, 'groups') as db:
+            db: Database
+
+            db.update_record(
+                query={"_id": body["room_id"]},
+                updated_data={"$push": {"messages": new_message_data}}
+            )
+
+        resp.media = {
+            "title": "ok",
+            "description": "New message has been successfully added"
         }

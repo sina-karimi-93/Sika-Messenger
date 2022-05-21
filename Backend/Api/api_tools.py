@@ -105,7 +105,7 @@ class ApiTools:
         }
         return new_chat_document
 
-    def create_new_group(group_data: dict) -> dict:
+    def create_new_group(name: str, owner: ObjectId) -> dict:
         """
         This method creates a dictionary which contains a group
         information based on database group collection schema.
@@ -120,7 +120,8 @@ class ApiTools:
         return -> dict
         """
         new_group_document = {
-            **group_data,
+            "group_name": name,
+            "owner": owner,
             "create_date": datetime.now(),
             "messages": [],
             "admins": [],
@@ -128,15 +129,3 @@ class ApiTools:
         }
 
         return new_group_document
-
-    def check_user_authorization(user_id: ObjectId, room: dict, just_owner=False) -> bool:
-        """
-        This method checks whether the user is owner or admin of a
-        group/channel or not.
-        """
-        if user_id == room['owner']:
-            return True
-        if just_owner == False:
-            if user_id in room['admins']:
-                return True
-        return False

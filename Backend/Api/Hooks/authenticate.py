@@ -15,7 +15,7 @@ class Authenticate:
     This class is a hook object for api routes. In __call__ method
     it checks whether the user is exists or not. Then if exists, it
     checks user credential and if everything is ok, it returns the user
-    data through request object to the route.
+    data through request object to the route (req.user).
     """
 
     def __call__(self, req, resp, resource, params) -> None:

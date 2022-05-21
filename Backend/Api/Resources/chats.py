@@ -60,8 +60,8 @@ class Chats:
         """
 
         # preparing chat data for making new chat document in database
-        chat_data = ApiTools.prepare_body_data(req.stream.read())
-        new_chat_document = ApiTools.create_new_chat(chat_data)
+        body = ApiTools.prepare_body_data(req.stream.read())
+        new_chat_document = ApiTools.create_new_chat(body)
 
         with Database(HOST, PORT, DB_NAME, 'chats') as db:
             db: Database
@@ -71,8 +71,8 @@ class Chats:
             matched_count = db.update_record(
                 query={"_id": {
                     "$in": [
-                        ObjectId(chat_data['owner']),
-                        ObjectId(chat_data['receiver'])
+                        ObjectId(body['owner']),
+                        ObjectId(body['receiver'])
                     ]}
                 },
                 updated_data={
@@ -102,9 +102,9 @@ class Chats:
         from body.
         """
 
-        message_data = ApiTools.prepare_body_data(req.stream.read())
+        body = ApiTools.prepare_body_data(req.stream.read())
         message_data = {'_id': ObjectId(),
-                        **message_data,
+                        **body,
                         'create_date': datetime.now(),
                         }
 
@@ -134,7 +134,7 @@ class Chats:
         After checking user credential, the message will be updated.
         """
 
-        message_data = ApiTools.prepare_body_data(req.stream.read())
+        body = ApiTools.prepare_body_data(req.stream.read())
         with Database(HOST, PORT, DB_NAME, 'chats') as db:
             db: Database
             match_count = db.update_record(
@@ -143,7 +143,7 @@ class Chats:
                     "messages._id": ObjectId(message_id)},
                 updated_data={
                     "$set": {
-                        "messages.$.message": message_data['message'],
+                        "messages.$.message": body['message'],
                         "messages.$.update_date": datetime.now()
                     }
                 }

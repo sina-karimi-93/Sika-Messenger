@@ -23,3 +23,4 @@ app.add_route("/user/groups", Groups())  # user groups
 app.add_route("/user/groups/add-member", Groups(), suffix="add_member")
 app.add_route("/user/groups/add-admin", Groups(), suffix="add_admin")
 app.add_route("/user/groups/remove-admin", Groups(), suffix="remove_admin")
+app.add_route("/user/groups/new-message", Groups(), suffix="new_message")

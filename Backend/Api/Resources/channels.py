@@ -1,7 +1,7 @@
 
-from bson import ObjectId
-import pymongo
 import falcon
+import pymongo
+from bson import ObjectId
 from falcon.asgi import Request
 from falcon.asgi import Response
 from falcon.asgi import WebSocket
@@ -83,3 +83,46 @@ class Channels:
             "channel_id": ApiTools.prepare_data_before_send(ObjectId(new_channel_id))
         }
     
+
+    @falcon.before(Authenticate())
+    @falcon.before(Authorize())
+    def on_delete(self, req:Request, resp:Response)-> None:
+        """
+        This route removes a channel. After authentication
+        and authorization (user have to be the owner of the channel),
+        channel will be removed and the id of the channel will be 
+        deleted from the users channels array.
+        """
+
+        if req.is_owner:
+            user = req.user
+            channel = req.room
+
+            all_channel_members = [
+                user["_id"], 
+                *channel["admins"],
+                *channel["members"]
+                ]
+
+            with Database(HOST, PORT,DB_NAME,'users') as db:
+                db:Database
+
+                # remove channel id from members channels array
+                db.update_record(
+                    query={"_id":{"$in":all_channel_members}},
+                    updated_data = {"$pull":{"channels":channel["_id"]}}
+                ) 
+
+                # remove the channel from channels collection   
+                db.delete_record(
+                    query={"_id":channel["_id"]}
+                )
+                resp.media = {
+                    "title": "ok",
+                    "description": "Channel has been successfully deleted."
+                }
+                return
+        resp.media = {
+            "title": "ok",
+            "description": "You are not the owner of the chennel."
+        }

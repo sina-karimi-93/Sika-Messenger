@@ -93,7 +93,10 @@ class Groups:
     @falcon.before(Authorize())
     def on_delete(self, req: falcon.Request, resp: falcon.Response) -> None:
         """
-        This method removes a group.
+        This route removes a group. After authentication
+        and authorization (user have to be the owner of the group),
+        group will be removed and the id of the group will be 
+        deleted from the users groups array.
         """
         group = req.room
         all_members = [req.user["_id"], *group["admins"], *group["members"]]

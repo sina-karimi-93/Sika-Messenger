@@ -173,14 +173,14 @@ class Channels:
     def on_patch_add_admin(self, req: Request, resp: Response) -> None:
         """
         This route change the authorization of a member to a admin in a channel.
-
+        Only owner of the channel has the authorization to do this.
         Request body:
             {
                 "room_id" : ObjectId,
                 "new_admin_id : ObjectId
             }
         """
-        # Check whether the applicant is owner of the group or not
+        # Check whether the applicant is owner of the channel or not
         if req.is_owner:
             
             new_admin_id = req.body_data["new_admin_id"]
@@ -210,4 +210,46 @@ class Channels:
         resp.media = {
             "title": "ok",
             "description": "You are not the owner of the group"
+        }
+
+    @falcon.before(Authenticate())
+    @falcon.before(Authorize())
+    def on_patch_remove_admin(self, req: Request, resp: Response) -> None:
+        """
+        This route changes the authorization of a admin to a member in a channel.
+        Only owner of the channel has authorization to do this act.
+        Request body:
+            {
+                "room_id" : ObjectId,
+                "admin_id : ObjectId
+            }
+        """
+        admin_id = req.body_data["admin_id"]
+        channel = req.room
+
+        # Check whether the applicant is owner of the channel or not
+        if req.is_owner:
+            with Database(HOST, PORT, DB_NAME, 'channels') as db:
+                db: Database
+
+                # Add member to channel members
+                db.update_record(
+                    query={"_id": channel["_id"]},
+                    updated_data={
+                        "$push": {"members": admin_id}}
+                )
+                # Remove admin from channel admins
+                db.update_record(
+                    query={"_id": channel["_id"]},
+                    updated_data={
+                        "$pull": {"admins": admin_id}}
+                )
+                resp.media = {
+                    "title": "ok",
+                    "description": "Admin successfully became member."
+                }
+                return
+        resp.media = {
+            "title": "ok",
+            "description": "You are not the owner of the channel."
         }

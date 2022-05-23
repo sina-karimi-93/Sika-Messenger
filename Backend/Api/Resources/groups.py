@@ -173,10 +173,12 @@ class Groups:
                 "new_admin_id : {"$oid": "..."}
             }
         """
-        body = req.body_data
-        group = req.room
         # Check whether the applicant is owner of the group or not
         if req.is_owner:
+            
+            body = req.body_data
+            group = req.room
+
             with Database(HOST, PORT, DB_NAME, 'groups') as db:
                 db: Database
 

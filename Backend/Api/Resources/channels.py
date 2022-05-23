@@ -126,3 +126,46 @@ class Channels:
             "title": "ok",
             "description": "You are not the owner of the chennel."
         }
+
+
+    @falcon.before(Authenticate())
+    @falcon.before(Authorize())
+    def on_patch_add_member(self, req:Request, resp:Response)-> None:
+        """
+        This route adds a new member to the channel. After authentication 
+        and authorization(user have to be the owner or admin of the channel)
+        new member will be added to the members array of the channel data
+        and also the channel id will be added to the member channels array.
+
+        Request body:
+            {
+                "room_id" : ObjectId,
+                "new_member_id : ObjectId
+            }
+        """
+
+        new_member_id = req.body_data["new_member_id"]
+        channel = req.room
+
+
+        with Database(HOST,PORT,DB_NAME,'channels') as db:
+            db:Database
+
+            # Add member to members array of the channel
+            db.update_record(
+                query={"_id":channel["_id"]},
+                updated_data={"$push":{"members":new_member_id}}
+            )
+
+            # Add channel id to the member channels array
+            db.update_record(
+                query={"_id":new_member_id},
+                updated_data={"$push":{"channels":channel["_id"]}}
+            )
+
+        resp.media = {
+            "title": "ok",
+            "description": "New member has been successfully added to the channel."
+        }
+
+    

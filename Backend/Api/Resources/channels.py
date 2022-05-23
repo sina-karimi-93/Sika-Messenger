@@ -79,8 +79,7 @@ class Channels:
         
         resp.media = {
             "title": "ok",
-            "description": "New group has been successfully created.",
+            "description": "New channel has been successfully created.",
             "channel_id": ApiTools.prepare_data_before_send(ObjectId(new_channel_id))
         }
-    
     

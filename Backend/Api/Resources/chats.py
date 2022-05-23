@@ -61,7 +61,8 @@ class Chats:
 
         # preparing chat data for making new chat document in database
         body = ApiTools.prepare_body_data(req.stream.read())
-        new_chat_document = ApiTools.create_new_chat(body)
+        new_chat_document = ApiTools.create_new_chat(
+            body, owner=req.user["_id"])
 
         with Database(HOST, PORT, DB_NAME, 'chats') as db:
             db: Database
@@ -94,7 +95,7 @@ class Chats:
         }
 
     @falcon.before(Authenticate())
-    def on_post_new_message(self, req: falcon.Request, resp: falcon.Response, chat_id: str) -> None:
+    def on_post_new_message(self, req: falcon.Request, resp: falcon.Response) -> None:
         """
         This method adds new message to ane existin chat.
         First user credential will be checked and if authenticated
@@ -104,7 +105,8 @@ class Chats:
 
         body = ApiTools.prepare_body_data(req.stream.read())
         message_data = {'_id': ObjectId(),
-                        **body,
+                        "message": body["message"],
+                        "owner": req.user["_id"],
                         'create_date': datetime.now(),
                         }
 
@@ -112,7 +114,7 @@ class Chats:
             db: Database
 
             match_count = db.update_record(
-                query={"_id": ObjectId(chat_id)},
+                query={"_id": ObjectId(body["chat_id"])},
                 updated_data={"$push": {"messages": message_data}}
             )
         if match_count:
@@ -127,8 +129,7 @@ class Chats:
         }
 
     @falcon.before(Authenticate())
-    def on_patch_update_message(self, req: falcon.Request, resp: falcon.Response,
-                                chat_id: str, message_id: str) -> None:
+    def on_patch_update_message(self, req: falcon.Request, resp: falcon.Response) -> None:
         """
         This method updates an existing message in a chat.
         After checking user credential, the message will be updated.
@@ -139,8 +140,8 @@ class Chats:
             db: Database
             match_count = db.update_record(
                 query={
-                    "_id": ObjectId(chat_id),
-                    "messages._id": ObjectId(message_id)},
+                    "_id": ObjectId(body["chat_id"]),
+                    "messages._id": ObjectId(body["message_id"])},
                 updated_data={
                     "$set": {
                         "messages.$.message": body['message'],

@@ -75,7 +75,7 @@ class ApiTools:
         is_match = bcrypt.checkpw(password.encode(), encoded_password.encode())
         return is_match
 
-    def create_new_chat(self, chat_data: dict) -> dict:
+    def create_new_chat(self, chat_data: dict, owner: ObjectId) -> dict:
         """
         This method creates a dictionary which contains a chat
         information based on database chats collection schema.
@@ -84,7 +84,6 @@ class ApiTools:
             chat_data -> dict:
                 {
                     "message":"Some message",
-                    "owner": {"$oid":"Some Id"},
                     "receiver":{"$oid":"Some Id"}
                 }
 
@@ -92,13 +91,13 @@ class ApiTools:
         """
         date = datetime.now()
         new_chat_document = {
-            "owners": [chat_data["owner"], chat_data["receiver"]],
+            "owners": [owner, chat_data["receiver"]],
             "create_date": date,
             "messages": [
                 {
                     "_id": ObjectId(),
                     "message": chat_data['message'],
-                    "owner":chat_data['owner'],
+                    "owner":owner,
                     "create_date":date
                 }
             ]
@@ -108,7 +107,7 @@ class ApiTools:
     def create_new_group(name: str, owner: ObjectId) -> dict:
         """
         This method creates a dictionary which contains a group
-        information based on database group collection schema.
+        information based on database groups collection schema.
 
         args:
             group_data -> dict:
@@ -129,3 +128,25 @@ class ApiTools:
         }
 
         return new_group_document
+
+    def create_new_channel(name: str, owner: ObjectId) -> dict:
+        """
+        This method creates a dictionary which contains a channel
+        information based on database channels collection schema.
+
+        args:
+            name -> channel name
+            owner -> owner id
+
+        return -> dict
+        """
+        new_channel_document = {
+            "channel_name": name,
+            "owner": owner,
+            "create_date": datetime.now(),
+            "messages": [],
+            "admins": [],
+            "members": []
+        }
+
+        return new_channel_document

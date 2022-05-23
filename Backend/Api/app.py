@@ -15,12 +15,13 @@ app.add_route("/user/delete", Users())
 
 
 app.add_route("/user/chats", Chats())
-app.add_route("/user/chats/{chat_id}", Chats(), suffix='new_message')
-app.add_route("/user/chats/{chat_id}/{message_id}",
-              Chats(), suffix='update_message')
+app.add_route("/user/chats", Chats(), suffix='new_message')
+app.add_route("/user/chats", Chats(), suffix='update_message')
 
 app.add_route("/user/groups", Groups())  # user groups
 app.add_route("/user/groups/add-member", Groups(), suffix="add_member")
 app.add_route("/user/groups/add-admin", Groups(), suffix="add_admin")
 app.add_route("/user/groups/remove-admin", Groups(), suffix="remove_admin")
 app.add_route("/user/groups/new-message", Groups(), suffix="new_message")
+
+app.add_route("/user/channels", Groups())  # user channels

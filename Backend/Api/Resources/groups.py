@@ -65,20 +65,20 @@ class Groups:
 
         # preparing group data for making new group document in database
         body = ApiTools.prepare_body_data(req.stream.read())
-        new_group_data = ApiTools.create_new_group(
+        new_group_document = ApiTools.create_new_group(
             name=body["group_name"], owner=req.user["_id"])
-        pprint(new_group_data)
+
         with Database(HOST, PORT, DB_NAME, 'groups') as db:
             db: Database
 
             # Insert new group document to groups collection
-            group_id = db.insert_record(new_group_data)
+            new_group_id = db.insert_record(new_group_document)
 
             # Insert created group id to user groups array.
             db.update_record(
                 query={"_id": ObjectId(req.user['_id'])},
                 updated_data={
-                    "$push": {"groups": ObjectId(group_id)}
+                    "$push": {"groups": ObjectId(new_group_id)}
                 },
                 collection_name='users'
             )
@@ -86,7 +86,7 @@ class Groups:
         resp.media = {
             "title": "ok",
             "description": "New group has been successfully created.",
-            "group_id": ApiTools.prepare_data_before_send(ObjectId(group_id))
+            "group_id": ApiTools.prepare_data_before_send(ObjectId(new_group_id))
         }
 
     @falcon.before(Authenticate())

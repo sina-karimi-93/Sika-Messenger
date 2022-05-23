@@ -168,4 +168,46 @@ class Channels:
             "description": "New member has been successfully added to the channel."
         }
 
-    
+    @falcon.before(Authenticate())
+    @falcon.before(Authorize())
+    def on_patch_add_admin(self, req: Request, resp: Response) -> None:
+        """
+        This route change the authorization of a member to a admin in a channel.
+
+        Request body:
+            {
+                "room_id" : ObjectId,
+                "new_admin_id : ObjectId
+            }
+        """
+        # Check whether the applicant is owner of the group or not
+        if req.is_owner:
+            
+            new_admin_id = req.body_data["new_admin_id"]
+            channel = req.room
+
+            with Database(HOST, PORT, DB_NAME, 'channels') as db:
+                db: Database
+
+                # Remove member from group members
+                db.update_record(
+                    query={"_id": channel["_id"]},
+                    updated_data={
+                        "$pull": {"members": new_admin_id}}
+                )
+                # Add member to group admins
+                db.update_record(
+                    query={"_id": channel["_id"]},
+                    updated_data={
+                        "$push": {"admins": new_admin_id}}
+                )
+                resp.media = {
+                    "title": "ok",
+                    "description": "Member successfully became admin."
+                }
+                return
+                
+        resp.media = {
+            "title": "ok",
+            "description": "You are not the owner of the group"
+        }

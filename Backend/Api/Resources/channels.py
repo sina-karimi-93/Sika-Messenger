@@ -13,6 +13,7 @@ from Api.api_tools import ApiTools
 from Database.db_handler import Database
 from Api.Hooks.authorize import Authorize
 from Api.Hooks.authenticate import Authenticate
+from Api.Hooks.channel_authoize import ChannelAuthorize
 
 HOST = 'localhost'
 PORT = 27017
@@ -23,9 +24,9 @@ DB_NAME = 'sika-messenger'
 class Channels:
 
     def __init__(self) -> None:
-        def __init__(self) -> None:
-            self.message = ''
-            self.new_message_date = datetime.now()
+
+        self.message = ''
+        self.new_message_date = datetime.now()
 
     def __str__(self) -> str:
         return "Channels"
@@ -34,6 +35,7 @@ class Channels:
         """
         This method gets all user groups chats.
         """
+        print(self.__dict__)
         user_channels_ids: list = req.user['channels']
         with Database(HOST, PORT, DB_NAME, 'channels') as db:
             db: Database
@@ -215,7 +217,8 @@ class Channels:
             "title": "ok",
             "description": "Member has been successfully removed from the channel."
         }
-    @falcon.before(Authenticate())
+
+
     @falcon.before(Authorize())
     async def on_patch_add_admin(self, req: Request, resp: Response) -> None:
         """
@@ -236,13 +239,13 @@ class Channels:
             with Database(HOST, PORT, DB_NAME, 'channels') as db:
                 db: Database
 
-                # Remove member from group members
+                # Remove member from channel members
                 db.update_record(
                     query={"_id": channel["_id"]},
                     updated_data={
                         "$pull": {"members": new_admin_id}}
                 )
-                # Add member to group admins
+                # Add member to channel admins
                 db.update_record(
                     query={"_id": channel["_id"]},
                     updated_data={
@@ -259,7 +262,6 @@ class Channels:
             "description": "You are not the owner of the group"
         }
 
-    @falcon.before(Authenticate())
     @falcon.before(Authorize())
     async def on_patch_remove_admin(self, req: Request, resp: Response) -> None:
         """
@@ -279,13 +281,13 @@ class Channels:
             with Database(HOST, PORT, DB_NAME, 'channels') as db:
                 db: Database
 
-                # Add member to channel members
+                # Add admin to channels members
                 db.update_record(
                     query={"_id": channel["_id"]},
                     updated_data={
                         "$push": {"members": admin_id}}
                 )
-                # Remove admin from channel admins
+                # Remove admin from channels admins
                 db.update_record(
                     query={"_id": channel["_id"]},
                     updated_data={
@@ -301,8 +303,7 @@ class Channels:
             "description": "You are not the owner of the channel."
         }
 
-
-    @falcon.before(Authenticate())
+    @falcon.before(ChannelAuthorize())
     async def on_websocket(self, req: Request, ws: WebSocket, channel_id: str)-> None:
         """
         This is a websocket route. Here owner or admins send messages and
@@ -329,7 +330,7 @@ class Channels:
                 if req.is_channel_auth == True:
                     self.message = new_message
                     self.new_message_date = datetime.now()
-                    self._add_new_message(self, req.room, new_message, user)
+                    self._add_new_message(req.channel, new_message, user)
                     sleep(0.1)
 
 
@@ -337,7 +338,7 @@ class Channels:
             print(e)
             self.is_sending_active = False
 
-    def _add_new_message(self,channel, message, owner) -> None:
+    def _add_new_message(self,channel:dict, message:str, owner:dict) -> None:
         """
         This method adds new message to the db channel messages array.
         Before a message come from the websocket route, it is authenticated
@@ -349,7 +350,6 @@ class Channels:
             "owner":owner["_id"],
             "created_date":datetime.now(),
         }
-
         with Database(HOST, PORT, DB_NAME, 'channels') as db:
             db:Database
 

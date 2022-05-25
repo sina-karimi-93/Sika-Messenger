@@ -22,7 +22,7 @@ class ChannelAuthorize:
 
     """
 
-    def __call__(self, req, res, resource, params) -> None:
+    async def __call__(self, req, res, resource, params) -> None:
 
         collection_name = str(resource).lower()
         channel_id = params["channel_id"]

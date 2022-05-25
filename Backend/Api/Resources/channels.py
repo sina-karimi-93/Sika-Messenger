@@ -180,6 +180,44 @@ class Channels:
 
     @falcon.before(Authenticate())
     @falcon.before(Authorize())
+    def on_patch_remove_member(self, req:Request, resp:Response)-> None:
+        """
+        This route adds a removes a member from the channel. After authentication 
+        and authorization(user have to be the owner or admin of the channel)
+        member will be remove from the members array of the channel data
+        and also the channel id will be removed from the member channels array.
+
+        Request body:
+            {
+                "room_id" : ObjectId,
+                "member_id : ObjectId
+            }
+        """
+
+        member_id = req.body_data["member_id"]
+        channel = req.room
+
+        with Database(HOST,PORT,DB_NAME,'channels') as db:
+            db:Database
+
+            # Add member to members array of the channel
+            db.update_record(
+                query={"_id":channel["_id"]},
+                updated_data={"$pull":{"members":member_id}}
+            )
+
+            # Add channel id to the member channels array
+            db.update_record(
+                query={"_id":member_id},
+                updated_data={"$pull":{"channels":channel["_id"]}}
+            )
+
+        resp.media = {
+            "title": "ok",
+            "description": "Member has been successfully removed from the channel."
+        }
+    @falcon.before(Authenticate())
+    @falcon.before(Authorize())
     def on_patch_add_admin(self, req: Request, resp: Response) -> None:
         """
         This route change the authorization of a member to a admin in a channel.

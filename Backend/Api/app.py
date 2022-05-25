@@ -1,5 +1,6 @@
 import falcon
 import falcon.asgi
+from Api.Resources.channels import Channels
 
 from Api.Resources.chats import Chats
 from Api.Resources.groups import Groups
@@ -24,4 +25,9 @@ app.add_route("/user/groups/add-admin", Groups(), suffix="add_admin")
 app.add_route("/user/groups/remove-admin", Groups(), suffix="remove_admin")
 app.add_route("/user/groups/new-message", Groups(), suffix="new_message")
 
-app.add_route("/user/channels", Groups())  # user channels
+app.add_route("/user/channels", Channels())  # user channels
+app.add_route("/user/channels/{channel_id}", Channels())  # channel websocket
+app.add_route("/user/channel/add-memeber", Channels(), suffix="add_member")
+app.add_route("/user/channel/add-memeber", Channels(), suffix="remove_member")
+app.add_route("/user/channel/add-admin", Channels(), suffix="add_admin")
+app.add_route("/user/channel/add-admin", Channels(), suffix="remove_admin")

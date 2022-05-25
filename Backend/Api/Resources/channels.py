@@ -177,7 +177,6 @@ class Channels:
             "description": "New member has been successfully added to the channel."
         }
 
-    @falcon.before(Authenticate())
     @falcon.before(Authorize())
     async def on_patch_remove_member(self, req:Request, resp:Response)-> None:
         """
@@ -199,16 +198,17 @@ class Channels:
         with Database(HOST,PORT,DB_NAME,'channels') as db:
             db:Database
 
-            # Add member to members array of the channel
+            # Remove member from members array of the channel
             db.update_record(
                 query={"_id":channel["_id"]},
                 updated_data={"$pull":{"members":member_id}}
             )
 
-            # Add channel id to the member channels array
+            # Remove channel id from the member channels array
             db.update_record(
                 query={"_id":member_id},
-                updated_data={"$pull":{"channels":channel["_id"]}}
+                updated_data={"$pull":{"channels":channel["_id"]}},
+                collection_name='users'
             )
 
         resp.media = {

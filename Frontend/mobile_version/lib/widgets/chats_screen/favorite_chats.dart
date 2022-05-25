@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class FavoriteChats extends StatelessWidget {
   FavoriteChats({
@@ -15,6 +17,11 @@ class FavoriteChats extends StatelessWidget {
     },
     {""}
   ];
+
+  final channel = IOWebSocketChannel.connect(
+    Uri.parse(""),
+  );
+
   @override
   Widget build(BuildContext context) {
     return Container(

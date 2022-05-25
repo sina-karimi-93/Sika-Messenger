@@ -1,7 +1,12 @@
 
 import falcon
+import asyncio
 import pymongo
+from time import sleep
 from bson import ObjectId
+from threading import Thread
+from datetime import datetime
+from collections import deque
 from falcon.asgi import Request
 from falcon.asgi import Response
 from falcon.asgi import WebSocket
@@ -17,6 +22,11 @@ DB_NAME = 'sika-messenger'
 
 
 class Channels:
+
+    def __init__(self) -> None:
+        def __init__(self) -> None:
+            self.message = ''
+            self.new_message_date = datetime.now()
 
     def __str__(self) -> str:
         return "Channels"
@@ -253,3 +263,97 @@ class Channels:
             "title": "ok",
             "description": "You are not the owner of the channel."
         }
+
+
+    @falcon.before(Authenticate())
+    async def on_websocket(self, req: Request, ws: WebSocket, channel_id: str)-> None:
+        """
+        This is a websocket route. Here owner or admins send messages and
+        all users receives them.
+        """
+
+        try:
+            await ws.accept()
+            await ws.send_media({
+                "title" : "ok",
+                "description": f"Connected to {channel_id}"
+                })
+
+
+            user = req.user
+            self.is_sending_active = True
+            sending_data_thread = Thread(target=self._async_bridge, args=(ws,))
+            sending_data_thread.start()
+
+            while True:
+                new_message = await ws.receive_text()
+                if req.channel_auth == True:
+                    self.message = new_message
+                    self.new_message_date = datetime.now()
+                    self._add_new_message(self, req.room, new_message, user)
+                    sleep(0.1)
+
+
+        except falcon.WebSocketDisconnected as e:
+            print(e)
+            self.is_sending_active = False
+
+    def _add_new_message(self,channel, message, owner) -> None:
+        """
+        This method add new message to the channel messages array.
+        Before a message come from the websocket route, it is authenticated
+        and authorized.
+        """
+        message={
+            "_id":ObjectId(),
+            "message":message,
+            "owner":owner["_id"],
+            "created_date":datetime.now(),
+        }
+
+        with Database(HOST, PORT, DB_NAME, 'channels') as db:
+            db:Database
+
+            db.update_record(
+                query={"_id": channel["_id"]},
+                updated_data={"$push":{"messages":message}}
+            )
+
+    def _async_bridge(self, ws:WebSocket)-> None:
+        """
+        The private method is a bridge between a async function and
+        a thread in websocket. Here we make an async functionality
+        """
+
+
+        loop = asyncio.new_event_loop()
+        loop.run_until_complete(self._send_message(ws))
+        loop.close()
+
+    async def _send_message(self, ws: WebSocket)->None:
+        """
+        This method is responsible for sending new messages to
+        the users. First it define current time. Then in a loop
+        it checks a new message have came or not (everytime an admin
+        or owner adds new message, it add the time of the receiving
+        message in class in self.new_message_date). If if the time 
+        of the new message is newer than the current time, it will
+        send message to the user.
+        """
+        now_date = datetime.now()
+        while self.running:
+            if now_date < self.new_message_date:
+                await ws.send_text(self.message)
+                now_date = self.new_message_date
+            sleep(0.1)
+
+
+
+    
+
+    
+
+    
+
+    
+

@@ -35,14 +35,14 @@ class ChannelAuthorize:
             req.channel = channel
 
             if user_id == channel["owner"]:
-                req.channel_auth = True
+                req.is_channel_auth = True
                 return
 
             elif user_id in channel["admins"]:
-                req.channel_auth = True
+                req.is_channel_auth = True
 
             else:
-                req.channel_auth = False
+                req.is_channel_auth = False
 
         except (KeyError, TypeError) as e:
             raise falcon.HTTPBadRequest(

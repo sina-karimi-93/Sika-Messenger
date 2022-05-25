@@ -281,13 +281,15 @@ class Channels:
 
 
             user = req.user
+            # This boolean is for controlling the thread working in _send_message()
             self.is_sending_active = True
             sending_data_thread = Thread(target=self._async_bridge, args=(ws,))
             sending_data_thread.start()
 
             while True:
                 new_message = await ws.receive_text()
-                if req.channel_auth == True:
+                # cheks whether the user is owner or admin
+                if req.is_channel_auth == True:
                     self.message = new_message
                     self.new_message_date = datetime.now()
                     self._add_new_message(self, req.room, new_message, user)
@@ -300,7 +302,7 @@ class Channels:
 
     def _add_new_message(self,channel, message, owner) -> None:
         """
-        This method add new message to the channel messages array.
+        This method adds new message to the db channel messages array.
         Before a message come from the websocket route, it is authenticated
         and authorized.
         """
@@ -321,10 +323,14 @@ class Channels:
 
     def _async_bridge(self, ws:WebSocket)-> None:
         """
-        The private method is a bridge between a async function and
-        a thread in websocket. Here we make an async functionality
-        """
+        This method is a bridge between a async function and
+        a thread in websocket. As we can not define an async
+        function in a thread, we have to make a bridge to establish
+        this connection.
 
+        args:
+            ws: instance of websocket which belongs to a user
+        """
 
         loop = asyncio.new_event_loop()
         loop.run_until_complete(self._send_message(ws))
@@ -339,9 +345,13 @@ class Channels:
         message in class in self.new_message_date). If if the time 
         of the new message is newer than the current time, it will
         send message to the user.
+
+        args:
+            ws: instance of websocket which belongs to a user
+                and we send message to the user with this.
         """
         now_date = datetime.now()
-        while self.running:
+        while self.is_sending_active:
             if now_date < self.new_message_date:
                 await ws.send_text(self.message)
                 now_date = self.new_message_date

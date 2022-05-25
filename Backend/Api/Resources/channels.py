@@ -56,7 +56,6 @@ class Channels:
             "groups": user_channels
         }
 
-    @falcon.before(Authenticate())
     async def on_post(self, req: Request, resp: Response) -> None:
         """
         This method creates new channel for the user.
@@ -67,7 +66,8 @@ class Channels:
             }
         """
 
-        body = ApiTools.prepare_body_data(req.stream.read())
+        body = ApiTools.prepare_body_data(await req.stream.read())
+
         new_channel_document = ApiTools.create_new_channel(
             name=body['channel_name'],
             owner=req.user["_id"])
@@ -89,7 +89,6 @@ class Channels:
         }
     
 
-    @falcon.before(Authenticate())
     @falcon.before(Authorize())
     async def on_delete(self, req:Request, resp:Response)-> None:
         """

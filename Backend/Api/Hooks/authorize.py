@@ -23,9 +23,9 @@ class Authorize:
 
     """
 
-    def __call__(self, req, res, resource, params) -> None:
+    async def __call__(self, req, res, resource, params) -> None:
 
-        req.body_data = ApiTools.prepare_body_data(req.stream.read())
+        req.body_data = ApiTools.prepare_body_data(await req.stream.read())
 
         collection_name = str(resource).lower()
         try:

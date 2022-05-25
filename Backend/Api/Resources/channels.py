@@ -52,8 +52,8 @@ class Channels:
 
         resp.media = {
             "title": "ok",
-            "description": "Groups are in descending order.",
-            "groups": user_channels
+            "description": "Channels are in descending order.",
+            "channels": user_channels
         }
 
     async def on_post(self, req: Request, resp: Response) -> None:
@@ -81,7 +81,7 @@ class Channels:
                 query={"_id":req.user["_id"]},
                 updated_data={"$push":{"channels":ObjectId(new_channel_id)}},
                 collection_name='users')
-        
+            
         resp.media = {
             "title": "ok",
             "description": "New channel has been successfully created.",
@@ -96,6 +96,10 @@ class Channels:
         and authorization (user have to be the owner of the channel),
         channel will be removed and the id of the channel will be 
         deleted from the users channels array.
+
+        Request body {
+            "room_id": {"$oid": "..."}
+        }
         """
 
         if req.is_owner:
@@ -119,7 +123,8 @@ class Channels:
 
                 # remove the channel from channels collection   
                 db.delete_record(
-                    query={"_id":channel["_id"]}
+                    query={"_id":channel["_id"]},
+                    collection_name='channels'
                 )
                 resp.media = {
                     "title": "ok",
@@ -132,7 +137,6 @@ class Channels:
         }
 
 
-    @falcon.before(Authenticate())
     @falcon.before(Authorize())
     async def on_patch_add_member(self, req:Request, resp:Response)-> None:
         """

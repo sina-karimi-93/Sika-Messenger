@@ -1,11 +1,8 @@
-from falcon.asgi import App
+import falcon.asgi 
 
-from Api.Resources.users import Users
-from Api.Resources.chats import Chats
-from Api.Resources.groups import Groups
 from Api.Resources.channels import Channels
 
-app = App()
+app = falcon.asgi.App()
 
 
 # app.add_route("/user/login", Users(), suffix="login")
@@ -25,8 +22,8 @@ app = App()
 # app.add_route("/user/groups/new-message", Groups(), suffix="new_message")
 
 app.add_route("/user/channels", Channels())  # user channels
-app.add_route("/user/channels/{channel_id}", Channels())  # channel websocket
-app.add_route("/user/channel/add-memeber", Channels(), suffix="add_member")
-app.add_route("/user/channel/add-memeber", Channels(), suffix="remove_member")
-app.add_route("/user/channel/add-admin", Channels(), suffix="add_admin")
-app.add_route("/user/channel/add-admin", Channels(), suffix="remove_admin")
+# app.add_route("/user/channels/{channel_id}", Channels())  # channel websocket
+# app.add_route("/user/channel/add-memeber", Channels(), suffix="add_member")
+# app.add_route("/user/channel/add-memeber", Channels(), suffix="remove_member")
+# app.add_route("/user/channel/add-admin", Channels(), suffix="add_admin")
+# app.add_route("/user/channel/add-admin", Channels(), suffix="remove_admin")

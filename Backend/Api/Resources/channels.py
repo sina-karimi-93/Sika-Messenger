@@ -22,11 +22,13 @@ DB_NAME = 'sika-messenger'
 
 @falcon.before(Authenticate())
 class Channels:
+    __slots__ = ("message", "new_message_date", "online_users")
 
     def __init__(self) -> None:
 
         self.message = ''
         self.new_message_date = datetime.now()
+        self.online_users = {}
 
     def __str__(self) -> str:
         return "Channels"
@@ -317,12 +319,8 @@ class Channels:
                 "description": f"Connected to {channel_id}"
                 })
 
-
             user = req.user
-            # This boolean is for controlling the thread working in _send_message()
-            self.is_sending_active = True
-            sending_data_thread = Thread(target=self._async_bridge, args=(ws,))
-            sending_data_thread.start()
+            self._add_new_thread(ws, user["_id"])
 
             while True:
                 new_message = await ws.receive_text()
@@ -336,7 +334,12 @@ class Channels:
 
         except falcon.WebSocketDisconnected as e:
             print(e)
-            self.is_sending_active = False
+            self.online_users[user["_id"]] = False
+            # This delay is necessary because it takes approximately 0.01 seconds
+            # until a thread be killed by python. So after this delay we remove
+            # the user status from online_users
+            sleep(0.1)
+            self.online_users.pop(user["_id"])
 
     def _add_new_message(self,channel:dict, message:str, owner:dict) -> None:
         """
@@ -358,22 +361,43 @@ class Channels:
                 updated_data={"$push":{"messages":message}}
             )
 
-    def _async_bridge(self, ws:WebSocket)-> None:
+    def _add_new_thread(self, ws: WebSocket, user_id: ObjectId)-> None:
         """
-        This method is a bridge between a async function and
-        a thread in websocket. As we can not define an async
+        This method creates new thread for each user. When a user becomes
+        online and connects to the websocket in this resource, for receiving
+        new message which adds by owner or admins, a thread will be made for
+        processing this actions.
+
+        args:
+            ws: instance of websocket which belongs to a user.
+
+            a key in online_users which defines a user is
+                     connected or not.
+        """
+        # This boolean is for controlling the thread working in _send_message()
+        self.online_users[user_id] = True
+        sending_data_thread = Thread(target=self._async_bridge, args=(ws, user_id))
+        sending_data_thread.start()
+
+    def _async_bridge(self, ws:WebSocket , user_id:ObjectId)-> None:
+        """
+        This method is a bridge between an async function (_send_message) and
+        a thread (_add_new_thread) in websocket. As we can not define an async
         function in a thread, we have to make a bridge to establish
         this connection.
 
         args:
-            ws: instance of websocket which belongs to a user
+            ws: instance of websocket which belongs to a user.
+
+            user_id: a key in online_users which defines a user is
+                     connected or not.
         """
 
         loop = asyncio.new_event_loop()
-        loop.run_until_complete(self._send_message(ws))
+        loop.run_until_complete(self._send_message(ws, user_id))
         loop.close()
 
-    async def _send_message(self, ws: WebSocket)->None:
+    async def _send_message(self, ws: WebSocket, user_id:ObjectId)->None:
         """
         This method is responsible for sending new messages to
         the users. First it define current time. Then in a loop
@@ -386,9 +410,14 @@ class Channels:
         args:
             ws: instance of websocket which belongs to a user
                 and we send message to the user with this.
+
+            user_id: this id is required to be aware of the user status
+                     (connected or not). When user is going offline, his/her
+                     status becomes False and the loop in this method will be
+                     broken.
         """
         now_date = datetime.now()
-        while self.is_sending_active:
+        while self.online_users[user_id]:
             if now_date < self.new_message_date:
                 await ws.send_text(self.message)
                 now_date = self.new_message_date

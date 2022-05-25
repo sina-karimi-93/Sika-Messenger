@@ -45,10 +45,8 @@ class ApiTools:
         return:
             dict
         """
-        print(auth_data)
         auth_type, auth_data = auth_data.split(' ')
         reshape = base64.b64decode(auth_data).decode("utf-8")
-        print("reshape->",reshape)
         user_credential = {
             "email": reshape.split(":")[0],
             "password": reshape.split(":")[1],
@@ -152,3 +150,9 @@ class ApiTools:
         }
 
         return new_channel_document
+
+
+# a = base64.b64encode(b"ali@gmail.com:1111")
+# print(a)
+# b = base64.b64decode(a)
+# print(b)

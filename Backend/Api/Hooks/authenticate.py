@@ -18,7 +18,7 @@ class Authenticate:
     data through request object to the route (req.user).
     """
 
-    def __call__(self, req, resp, resource, params) -> None:
+    async def __call__(self, req, resp, resource, params) -> None:
 
         print("Authenticate")
         user_credential = ApiTools.extract_auth_data(req.auth)

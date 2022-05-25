@@ -6,7 +6,6 @@ from time import sleep
 from bson import ObjectId
 from threading import Thread
 from datetime import datetime
-from collections import deque
 from falcon.asgi import Request
 from falcon.asgi import Response
 from falcon.asgi import WebSocket
@@ -15,12 +14,12 @@ from Database.db_handler import Database
 from Api.Hooks.authorize import Authorize
 from Api.Hooks.authenticate import Authenticate
 
-
 HOST = 'localhost'
 PORT = 27017
 DB_NAME = 'sika-messenger'
 
 
+@falcon.before(Authenticate())
 class Channels:
 
     def __init__(self) -> None:
@@ -31,14 +30,11 @@ class Channels:
     def __str__(self) -> str:
         return "Channels"
 
-    @falcon.before(Authenticate())
-    def on_get(self, req: Request, resp: Response) -> None:
+    async def on_get(self, req: Request, resp: Response) -> None:
         """
         This method gets all user groups chats.
         """
-
         user_channels_ids: list = req.user['channels']
-
         with Database(HOST, PORT, DB_NAME, 'channels') as db:
             db: Database
             user_channels = tuple(db.get_record(
@@ -61,14 +57,13 @@ class Channels:
         }
 
     @falcon.before(Authenticate())
-    def on_post(self, req: Request, resp: Response) -> None:
+    async def on_post(self, req: Request, resp: Response) -> None:
         """
         This method creates new channel for the user.
 
         Request body:
             {
                 "channel_name" : str,
-                "owner" : {"$oid": "..."}
             }
         """
 
@@ -96,7 +91,7 @@ class Channels:
 
     @falcon.before(Authenticate())
     @falcon.before(Authorize())
-    def on_delete(self, req:Request, resp:Response)-> None:
+    async def on_delete(self, req:Request, resp:Response)-> None:
         """
         This route removes a channel. After authentication
         and authorization (user have to be the owner of the channel),
@@ -140,7 +135,7 @@ class Channels:
 
     @falcon.before(Authenticate())
     @falcon.before(Authorize())
-    def on_patch_add_member(self, req:Request, resp:Response)-> None:
+    async def on_patch_add_member(self, req:Request, resp:Response)-> None:
         """
         This route adds a new member to the channel. After authentication 
         and authorization(user have to be the owner or admin of the channel)
@@ -180,7 +175,7 @@ class Channels:
 
     @falcon.before(Authenticate())
     @falcon.before(Authorize())
-    def on_patch_remove_member(self, req:Request, resp:Response)-> None:
+    async def on_patch_remove_member(self, req:Request, resp:Response)-> None:
         """
         This route adds a removes a member from the channel. After authentication 
         and authorization(user have to be the owner or admin of the channel)
@@ -218,7 +213,7 @@ class Channels:
         }
     @falcon.before(Authenticate())
     @falcon.before(Authorize())
-    def on_patch_add_admin(self, req: Request, resp: Response) -> None:
+    async def on_patch_add_admin(self, req: Request, resp: Response) -> None:
         """
         This route change the authorization of a member to a admin in a channel.
         Only owner of the channel has the authorization to do this.
@@ -262,7 +257,7 @@ class Channels:
 
     @falcon.before(Authenticate())
     @falcon.before(Authorize())
-    def on_patch_remove_admin(self, req: Request, resp: Response) -> None:
+    async def on_patch_remove_admin(self, req: Request, resp: Response) -> None:
         """
         This route changes the authorization of a admin to a member in a channel.
         Only owner of the channel has authorization to do this act.

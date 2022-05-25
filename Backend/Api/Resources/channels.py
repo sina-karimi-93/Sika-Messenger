@@ -168,7 +168,8 @@ class Channels:
             # Add channel id to the member channels array
             db.update_record(
                 query={"_id":new_member_id},
-                updated_data={"$push":{"channels":channel["_id"]}}
+                updated_data={"$push":{"channels":channel["_id"]}},
+                collection_name='users',
             )
 
         resp.media = {

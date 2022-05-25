@@ -23,7 +23,7 @@ app = falcon.asgi.App()
 
 app.add_route("/user/channels", Channels())  # user channels
 # app.add_route("/user/channels/{channel_id}", Channels())  # channel websocket
-# app.add_route("/user/channel/add-memeber", Channels(), suffix="add_member")
+app.add_route("/user/channel/add-member", Channels(), suffix="add_member")
 # app.add_route("/user/channel/add-memeber", Channels(), suffix="remove_member")
 # app.add_route("/user/channel/add-admin", Channels(), suffix="add_admin")
 # app.add_route("/user/channel/add-admin", Channels(), suffix="remove_admin")

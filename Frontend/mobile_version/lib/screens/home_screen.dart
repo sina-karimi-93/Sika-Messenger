@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/home_screen/header.dart';
+import '../widgets/home_screen/chat_item.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -9,10 +10,6 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final bool isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
-
     return Scaffold(
       drawer: AppDrawer(),
       appBar: AppBar(
@@ -22,7 +19,15 @@ class HomeScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Header(),
+          const Header(),
+          FutureBuilder(
+            builder: ((context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator();
+              }
+              return Container();
+            }),
+          ),
         ],
       ),
     );

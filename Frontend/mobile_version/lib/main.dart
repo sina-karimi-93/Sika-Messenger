@@ -18,7 +18,8 @@ class MyApp extends StatelessWidget {
       theme: theme.copyWith(
         colorScheme: theme.colorScheme.copyWith(
           primary: const Color.fromRGBO(44, 95, 45, 1),
-          secondary: const Color.fromRGBO(255, 180, 0, 1),
+          // secondary: const Color.fromRGBO(255, 180, 0, 1),
+          secondary: Colors.deepOrange,
         ),
       ),
       home: const HomeScreen(),

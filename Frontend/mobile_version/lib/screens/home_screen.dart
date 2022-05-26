@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../widgets/app_drawer.dart';
-import '../widgets/chats_screen/favorite_chats.dart';
+import '../widgets/home_screen/header.dart';
 
-class ChatsScreen extends StatelessWidget {
-  const ChatsScreen({Key? key}) : super(key: key);
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({Key? key}) : super(key: key);
 
   final String status = "Connecting...";
 
@@ -22,7 +22,7 @@ class ChatsScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          FavoriteChats(size: size),
+          Header(),
         ],
       ),
     );

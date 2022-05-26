@@ -20,14 +20,6 @@ class HomeScreen extends StatelessWidget {
       body: Column(
         children: [
           const Header(),
-          FutureBuilder(
-            builder: ((context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator();
-              }
-              return Container();
-            }),
-          ),
         ],
       ),
     );

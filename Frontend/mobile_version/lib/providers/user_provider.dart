@@ -16,7 +16,7 @@ class UserProvider with ChangeNotifier {
     channels: [],
   );
 
-  Future<void> login(String email, String password) async {
+  Future<bool> login(String email, String password) async {
     /*
     This method checks user credential and send a request to server
     for authentication and gets the response.
@@ -26,5 +26,10 @@ class UserProvider with ChangeNotifier {
       password
     */
     final response = await server.loginUser(email, password);
+    if (response["title"] == "error") {
+      return false;
+    }
+    print(response.runtimeType);
+    return true;
   }
 }

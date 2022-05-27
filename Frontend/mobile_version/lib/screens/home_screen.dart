@@ -6,7 +6,7 @@ import '../widgets/home_screen/chat_item.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
-
+  static const routeName = 'home-screen';
   final String status = "Connecting...";
 
   @override
@@ -21,7 +21,7 @@ class HomeScreen extends StatelessWidget {
       body: Column(
         children: [
           const Header(),
-          Chats(),
+          // Chats(),
         ],
       ),
     );

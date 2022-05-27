@@ -42,11 +42,10 @@ Future<dynamic> loginUser(String email, String password) async {
     email: user email
     password: user password
   */
-  Uri loginUrl = Uri.http("192.168.1.106", "/user/login");
+  Uri loginUrl = Uri.http("192.168.1.106:8001", "/user/login");
   final Map<String, String> headers = {
     "authorization": convertToBase64(email, password)
   };
   final response = await http.post(loginUrl, headers: headers);
-
-  return response.body;
+  return json.decode(response.body);
 }

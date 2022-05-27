@@ -67,4 +67,20 @@ class UserProvider with ChangeNotifier {
     setUser(await DbHandler.getUser(localId));
     return true;
   }
+
+  Future<void> logout(int localId) async {
+    /*
+    This method logout the user. First it remove user from local database,
+    then reset the user class variable.
+    */
+    await DbHandler.deleteUser(localId);
+    var user = const User(
+      localId: 0,
+      serverId: 'serverId',
+      name: 'name',
+      email: 'email',
+      password: 'password',
+      phoneNumber: 'phoneNumber',
+    );
+  }
 }

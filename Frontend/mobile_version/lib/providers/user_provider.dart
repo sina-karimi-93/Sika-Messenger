@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import '../models/user.dart';
+import '../tools/connection_tools.dart' as server;
 
 class UserProvider with ChangeNotifier {
   var user = User(
@@ -14,4 +15,8 @@ class UserProvider with ChangeNotifier {
     groups: [],
     channels: [],
   );
+
+  Future<void> login(String email, String password) async {
+    final response = await server.loginUser(email, password);
+  }
 }

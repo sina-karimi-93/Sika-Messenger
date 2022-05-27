@@ -37,7 +37,6 @@ class Channels:
         """
         This method gets all user groups chats.
         """
-        print(self.__dict__)
         user_channels_ids: list = req.user['channels']
         with Database(HOST, PORT, DB_NAME, 'channels') as db:
             db: Database

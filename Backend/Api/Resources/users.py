@@ -1,10 +1,10 @@
 import falcon
-from pprint import pprint
 from datetime import datetime
-from Database.db_handler import Database
 from Api.api_tools import ApiTools
-from Api.Hooks.signup_check_user_exists import SignupCheckUserExists
+from Database.db_handler import Database
 from Api.Hooks.authenticate import Authenticate
+from falcon.asgi import Request,Response,WebSocket
+from Api.Hooks.signup_check_user_exists import SignupCheckUserExists
 
 HOST = 'localhost'
 PORT = 27017
@@ -17,7 +17,7 @@ class Users:
         return "Users"
 
     @falcon.before(Authenticate())
-    def on_post_login(self, req: falcon.Request, resp: falcon.Response):
+    async def on_post_login(self, req: Request, resp: Response):
         """
         This method checks the user credential and if valid
         return a valid response for authentication and the user data.

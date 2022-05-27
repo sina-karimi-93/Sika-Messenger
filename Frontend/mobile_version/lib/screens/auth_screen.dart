@@ -47,7 +47,7 @@ class _AuthScreenState extends State<AuthScreen> {
       });
 
       if (result) {
-        // Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+        Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
         return null;
       }
       showDialog(

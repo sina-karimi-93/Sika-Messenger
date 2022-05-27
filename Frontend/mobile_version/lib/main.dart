@@ -37,7 +37,8 @@ class MyApp extends StatelessWidget {
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
               if (snapshot.data!.isNotEmpty) {
-                Provider.of<UserProvider>(context, listen: false);
+                Provider.of<UserProvider>(context, listen: false)
+                    .setUser(snapshot.data!.first);
                 return const HomeScreen();
               } else {
                 return const AuthScreen();
@@ -46,7 +47,9 @@ class MyApp extends StatelessWidget {
               return Scaffold(
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 body: const Center(
-                  child: CircularProgressIndicator(),
+                  child: CircularProgressIndicator(
+                    color: Colors.amber,
+                  ),
                 ),
               );
             } else {

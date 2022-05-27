@@ -5,19 +5,15 @@ import '../database/db_handler.dart';
 
 class UserProvider with ChangeNotifier {
   var user = const User(
-    localId: 'localId',
+    localId: 0,
     serverId: 'serverId',
     name: 'name',
     email: 'email',
     password: 'password',
     phoneNumber: 'phoneNumber',
-    profilePictures: [],
-    chats: [],
-    groups: [],
-    channels: [],
   );
 
-  void setUser(int localId, Map<String, dynamic> userData) {
+  void setUser(Map<String, dynamic> userData) {
     /*
     After user login and gets a local id, A container will be generated
     for interacting and getting recessary information user in the app.
@@ -27,16 +23,12 @@ class UserProvider with ChangeNotifier {
       userData -> user data which comes from server
     */
     user = User(
-        localId: localId.toString(),
-        serverId: userData["_id"]["\$oid"],
+        localId: userData["localId"],
+        serverId: userData["serverId"],
         name: userData["name"],
         email: userData["email"],
         password: userData["password"],
-        phoneNumber: userData["phone_number"],
-        profilePictures: userData["profile_prictures"],
-        chats: userData["chats"],
-        groups: userData["groups"],
-        channels: userData["channels"]);
+        phoneNumber: userData["phoneNumber"]);
   }
 
   Future<bool> login(String email, String password) async {
@@ -69,10 +61,10 @@ class UserProvider with ChangeNotifier {
         "email": user["email"],
         "name": user["name"],
         "password": user["password"],
-        "phoneNumber": user["phone_number"]
+        "phoneNumber": user["phone_number"],
       },
     );
-    setUser(localId, user);
+    setUser(await DbHandler.getUser(localId));
     return true;
   }
 }

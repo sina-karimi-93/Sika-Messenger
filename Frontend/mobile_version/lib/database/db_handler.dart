@@ -63,7 +63,7 @@ class DbHandler {
     return records;
   }
 
-  static Future<Map<String, dynamic>> getUser(String localId) async {
+  static Future<Map<String, dynamic>> getUser(int localId) async {
     /*
     This method gets a table name and userId and return a user that
     matches.

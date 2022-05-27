@@ -4,23 +4,40 @@ import '../tools/connection_tools.dart' as server;
 import '../database/db_handler.dart';
 
 class UserProvider with ChangeNotifier {
-  var user = User(
-    id: 'id',
+  var user = const User(
+    localId: 'localId',
+    serverId: 'serverId',
     name: 'name',
     email: 'email',
     password: 'password',
     phoneNumber: 'phoneNumber',
-    createdDate: DateTime(2022),
     profilePictures: [],
     chats: [],
     groups: [],
     channels: [],
   );
 
-  // bool _checkUserExists(String serverId) {
-  //   DbHandler.getUser(userId)
-  //   return true;
-  // }
+  void setUser(int localId, Map<String, dynamic> userData) {
+    /*
+    After user login and gets a local id, A container will be generated
+    for interacting and getting recessary information user in the app.
+    
+    args:
+      localId -> user id in database
+      userData -> user data which comes from server
+    */
+    user = User(
+        localId: localId.toString(),
+        serverId: userData["_id"]["\$oid"],
+        name: userData["name"],
+        email: userData["email"],
+        password: userData["password"],
+        phoneNumber: userData["phone_number"],
+        profilePictures: userData["profile_prictures"],
+        chats: userData["chats"],
+        groups: userData["groups"],
+        channels: userData["channels"]);
+  }
 
   Future<bool> login(String email, String password) async {
     /*
@@ -55,6 +72,7 @@ class UserProvider with ChangeNotifier {
         "phoneNumber": user["phone_number"]
       },
     );
+    setUser(localId, user);
     return true;
   }
 }

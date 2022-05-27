@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_version/providers/user_provider.dart';
 import 'package:provider/provider.dart';
+
+import './database/db_handler.dart';
+import './providers/user_provider.dart';
 // Screens
 import 'screens/home_screen.dart';
 import 'screens/auth_screen.dart';
@@ -30,7 +32,38 @@ class MyApp extends StatelessWidget {
             secondary: Colors.deepOrange,
           ),
         ),
-        home: const AuthScreen(),
+        home: FutureBuilder<List>(
+          future: DbHandler.getRecord(table: "users"),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.data!.isNotEmpty) {
+                Provider.of<UserProvider>(context, listen: false);
+                return const HomeScreen();
+              } else {
+                return const AuthScreen();
+              }
+            } else if (snapshot.connectionState == ConnectionState.waiting) {
+              return Scaffold(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                body: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            } else {
+              return const Scaffold(
+                backgroundColor: Colors.red,
+                body: Center(
+                    child: Text(
+                  "Something went wrong, please reinstall your app.",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                )),
+              );
+            }
+          },
+        ),
         routes: {
           AuthScreen.routeName: ((context) => const AuthScreen()),
           HomeScreen.routeName: ((context) => const HomeScreen()),

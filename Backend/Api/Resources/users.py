@@ -30,7 +30,7 @@ class Users:
         }
 
     @falcon.before(SignupCheckUserExists())
-    def on_post_signup(self, req: falcon.Request, resp: falcon.Response):
+    async def on_post_signup(self, req: falcon.Request, resp: falcon.Response):
         """
         This method is stands for creating new user. With a hook first 
         it checks whether the user exists or not. If does not exists then

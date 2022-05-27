@@ -10,7 +10,7 @@ DB_NAME = 'sika-messenger'
 class SignupCheckUserExists:
     """"""
 
-    def __call__(self, req, resp, resource, params) -> None:
+    async def __call__(self, req, resp, resource, params) -> None:
         """
         This magic method checks whether a user with this desired
         email is exists or not.
@@ -21,7 +21,7 @@ class SignupCheckUserExists:
         except KeyError as e:
             raise falcon.HTTPBadRequest(
                 title="error",
-                description="There is no email in the sent data.")
+                description="There is no email in the data.")
 
         with Database(HOST, PORT, DB_NAME, "users") as db:
             db: Database

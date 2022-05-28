@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ChannelMessage extends StatelessWidget {
   const ChannelMessage(this.message, this.createDate, this.updateDate,
@@ -18,15 +19,16 @@ class ChannelMessage extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
             spreadRadius: 1,
             blurRadius: 8,
-            color: Colors.black87,
+            color: Theme.of(context).colorScheme.primary,
           )
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             message,
@@ -58,7 +60,7 @@ class ChannelMessage extends StatelessWidget {
                 ),
               if (updateDate.isEmpty)
                 Text(
-                  createDate,
+                  DateFormat().format(DateTime.parse(createDate)),
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.primary,
                     fontWeight: FontWeight.bold,

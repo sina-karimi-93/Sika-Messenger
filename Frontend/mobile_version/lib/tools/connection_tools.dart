@@ -70,7 +70,7 @@ Future<dynamic> loginUser(String email, String password) async {
   return json.decode(response.body);
 }
 
-Stream<dynamic> connectToWebSocket(
+ws.IOWebSocketChannel connectToWebSocket(
     String url, Map<String, dynamic> userCredential) {
   /*
   This method stablish a socket connection with the desired websocket and return
@@ -81,5 +81,5 @@ Stream<dynamic> connectToWebSocket(
   };
   final Uri uri = Uri.parse("ws://192.168.1.106:8001$url");
   final connection = ws.IOWebSocketChannel.connect(uri, headers: headers);
-  return connection.stream;
+  return connection;
 }

@@ -108,6 +108,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   // ============================== Email ==============================
                   const SizedBox(height: 5),
                   TextFormField(
+                    initialValue: null,
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {

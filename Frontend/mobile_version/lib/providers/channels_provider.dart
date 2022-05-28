@@ -71,8 +71,15 @@ class ChannelsProvider with ChangeNotifier {
 
   void addMessage(
       String channelId, String message, String owner, String createDate) {
-    final message =
-        Message(id: id, message: message, owner: owner, createDate: createDate);
-    _channels.where((element) => element.id == channelId).first.messages;
+    /*
+        This method adds new message to a specific channel.
+        */
+    final new_message = Message(
+        id: channelId, message: message, owner: owner, createDate: createDate);
+    _channels
+        .where((element) => element.id == channelId)
+        .first
+        .messages
+        .add(new_message);
   }
 }

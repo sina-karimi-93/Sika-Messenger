@@ -43,7 +43,6 @@ class Channels:
             user_channels = tuple(db.get_record(
                 {"_id": {"$in": user_channels_ids}}, find_one=False).sort(
                 'create_date', pymongo.DESCENDING))
-
         if len(user_channels) < 1:
             resp.media = {
                 "title": "error",
@@ -315,7 +314,7 @@ class Channels:
             await ws.accept()
             user = req.user
             self._add_new_thread(ws, user["_id"], channel_id)
-
+            print("called")
             while True:
                 new_message = await ws.receive_text()
                 # cheks whether the user is owner or admin
@@ -345,7 +344,8 @@ class Channels:
             "_id":ObjectId(),
             "message":message,
             "owner":owner["_id"],
-            "created_date":datetime.now(),
+            "create_date":datetime.now(),
+            "update_date":None,
         }
         with Database(HOST, PORT, DB_NAME, 'channels') as db:
             db:Database
@@ -355,7 +355,7 @@ class Channels:
                 updated_data={"$push":{"messages":message}}
             )
 
-    def _add_new_thread(self, ws: WebSocket, user_id: ObjectId)-> None:
+    def _add_new_thread(self, ws: WebSocket, user_id: ObjectId, channel_id:str)-> None:
         """
         This method creates new thread for each user. When a user becomes
         online and connects to the websocket in this resource, for receiving
@@ -370,7 +370,7 @@ class Channels:
         """
         # This boolean is for controlling the thread working in _send_message()
         self.online_users[user_id] = True
-        sending_data_thread = Thread(target=self._async_bridge, args=(ws, user_id))
+        sending_data_thread = Thread(target=self._async_bridge, args=(ws, user_id, channel_id))
         sending_data_thread.start()
 
     def _async_bridge(self, ws:WebSocket , user_id:ObjectId, channel_id:str)-> None:
@@ -410,7 +410,7 @@ class Channels:
                     "admins":0,
                     "members":0,
                     "messages":{"$slice":-1}
-                })[0]
+                })["messages"][0]
         return last_message
 
 

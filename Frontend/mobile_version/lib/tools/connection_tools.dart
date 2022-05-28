@@ -14,23 +14,42 @@ String convertToBase64(String email, String password) {
   return headerAuthorizeShape;
 }
 
-Future<bool> getAllUserData() async {
-  Map<String, String> headers = {
-    "authorization": convertToBase64("sina@gmail.com", "1111")
+Future<dynamic> apiInteraction(
+  String path,
+  Map userCredential,
+  String method, {
+  body = const {},
+}) async {
+  /*
+  This method is the core of the interaction with the server APIs.
+
+  args:
+    path: url of the desired route
+    userCredential: includes email and password(later we use tokens)
+    method: http method request, it could be get, post, patch or delete
+  */
+  final uri = Uri.http("192.168.1.106:8001", path);
+  final headers = {
+    "authorization": convertToBase64(userCredential["email"], "1111")
   };
-  // Uri userChatsUrl = Uri.parse("127.0.0.1:8001/user/chats");
-  // Uri userGroupsUrl = Uri.parse("127.0.0.1:8001/user/groups");
-  Uri userChannelsUrl = Uri.http("192.168.1.106:8001", "/user/channels");
-  final userData = await Future.wait([
-    // http.get(userChatsUrl),
-    // http.get(userGroupsUrl),
-    http.get(
-      userChannelsUrl,
-      headers: headers,
-    ),
-  ]);
-  print(userData[0].body);
-  return true;
+  var response;
+  var encodedBody = json.encode(body);
+
+  switch (method) {
+    case "get":
+      response = await http.get(uri, headers: headers);
+      break;
+    case "post":
+      response = await http.post(uri, headers: headers, body: encodedBody);
+      break;
+    case "patch":
+      response = await http.patch(uri, headers: headers, body: encodedBody);
+      break;
+    case "delete":
+      response = await http.delete(uri, headers: headers, body: encodedBody);
+  }
+
+  return json.decode(response.body);
 }
 
 Future<dynamic> loginUser(String email, String password) async {

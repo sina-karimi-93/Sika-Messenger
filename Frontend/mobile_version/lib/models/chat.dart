@@ -1,13 +1,15 @@
+import './message.dart';
+
 class Chat {
   const Chat({
     required this.id,
-    required this.owner,
-    required this.message,
-    required this.createdDate,
+    required this.owners,
+    required this.messages,
+    required this.createDate,
   });
 
   final String id;
-  final String owner;
-  final String message;
-  final DateTime createdDate;
+  final List<String> owners;
+  final List<Message> messages;
+  final String createDate;
 }

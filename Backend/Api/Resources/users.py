@@ -1,3 +1,4 @@
+from bson import ObjectId
 import falcon
 from datetime import datetime
 from Api.api_tools import ApiTools
@@ -15,6 +16,32 @@ class Users:
 
     def __str__(self) -> str:
         return "Users"
+
+    @falcon.before(Authenticate())
+    async def on_post(self, req:Request, resp:Response)-> None:
+        """
+        This method receives a user id and return a few information about him/her.
+        """
+        print("Called on post");
+        body = ApiTools.prepare_body_data(await req.stream.read())
+        with Database(HOST,PORT,DB_NAME,'users') as db:
+            db:Database
+
+            user = db.get_record({"_id":body["user_id"]})
+        
+        customize_user = {
+            "_id":user["_id"],
+            "name":user["name"],
+            "email":user["email"],
+            "phone_number": user["phone_number"],
+            "profile_pictures":user["profile_pictures"]
+            }
+        customize_user = ApiTools.prepare_data_before_send(customize_user)
+        resp.media = {
+            "title": "ok",
+            "description": "User exists",
+            "user":customize_user
+        }
 
     @falcon.before(Authenticate())
     async def on_post_login(self, req: Request, resp: Response):
@@ -56,7 +83,7 @@ class Users:
         }
 
     @falcon.before(Authenticate())
-    def on_patch_edit(self, req: falcon.Request, resp: falcon.Response) -> None:
+    async def on_patch_edit(self, req: falcon.Request, resp: falcon.Response) -> None:
         """
         This method updates users information like, name, phone_number.
         First via hooks, it checks whether the user credential is match or not. If
@@ -85,7 +112,7 @@ class Users:
         }
 
     @falcon.before(Authenticate())
-    def on_delete(self, req: falcon.Request, resp: falcon.Response) -> None:
+    async def on_delete(self, req: falcon.Request, resp: falcon.Response) -> None:
         """
         This method removes a user from database. First via hooks it checks
         user credential and if valid it will remove the user from database.

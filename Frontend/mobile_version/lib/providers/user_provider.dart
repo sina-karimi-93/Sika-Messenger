@@ -74,7 +74,7 @@ class UserProvider with ChangeNotifier {
     then reset the user class variable.
     */
     await DbHandler.deleteUser(localId);
-    var user = const User(
+    user = const User(
       localId: 0,
       serverId: 'serverId',
       name: 'name',

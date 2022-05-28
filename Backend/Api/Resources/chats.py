@@ -12,14 +12,13 @@ HOST = 'localhost'
 PORT = 27017
 DB_NAME = 'sika-messenger'
 
-
+@falcon.before(Authenticate())
 class Chats:
 
     def __str__(self) -> str:
         return "Chats"
 
-    @falcon.before(Authenticate())
-    def on_get(self, req: falcon.Request, resp: falcon.Response) -> None:
+    async def on_get(self, req: falcon.Request, resp: falcon.Response) -> None:
         """
         This method gets all chats that user has. First it checks the user
         credential and if valid, it will gives the users chats.
@@ -50,8 +49,7 @@ class Chats:
             "chats": user_chats
         }
 
-    @falcon.before(Authenticate())
-    def on_post(self, req: falcon.Request, resp: falcon.Response) -> None:
+    async def on_post(self, req: falcon.Request, resp: falcon.Response) -> None:
         """
         This method creates new chat for the user. After user authentication,
         It creates new chat document.Then it will insert it to the database and
@@ -94,8 +92,7 @@ class Chats:
             "description": "Something went wrong!"
         }
 
-    @falcon.before(Authenticate())
-    def on_post_new_message(self, req: falcon.Request, resp: falcon.Response) -> None:
+    async def on_post_new_message(self, req: falcon.Request, resp: falcon.Response) -> None:
         """
         This method adds new message to ane existin chat.
         First user credential will be checked and if authenticated
@@ -128,8 +125,7 @@ class Chats:
             "description": "Something went wrong"
         }
 
-    @falcon.before(Authenticate())
-    def on_patch_update_message(self, req: falcon.Request, resp: falcon.Response) -> None:
+    async def on_patch_update_message(self, req: falcon.Request, resp: falcon.Response) -> None:
         """
         This method updates an existing message in a chat.
         After checking user credential, the message will be updated.

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_version/widgets/home_screen/chats.dart';
+import 'package:mobile_version/widgets/home_screen/private_chats.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/home_screen/header.dart';
 import '../widgets/home_screen/chat_item.dart';
@@ -21,7 +21,7 @@ class HomeScreen extends StatelessWidget {
       body: Column(
         children: [
           const Header(),
-          // Chats(),
+          PrivateChats(),
         ],
       ),
     );

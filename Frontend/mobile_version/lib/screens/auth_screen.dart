@@ -73,11 +73,13 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final bool isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
       body: Center(
         child: Container(
-          width: size.width * 0.85,
+          width: isPortrait ? size.width * 0.85 : size.width * 0.5,
           height: _isLoginMode ? size.height * 0.42 : size.height * 0.6,
           padding:
               const EdgeInsets.only(top: 20, bottom: 4, left: 15, right: 15),
@@ -86,14 +88,14 @@ class _AuthScreenState extends State<AuthScreen> {
             border: Border.all(
               width: 1,
               // color: Theme.of(context).colorScheme.secondary.withOpacity(0.7),
-              color: Colors.cyan,
+              color: Colors.black12,
             ),
             borderRadius: BorderRadius.circular(30),
             boxShadow: const [
               BoxShadow(
                 blurRadius: 15,
                 spreadRadius: 5,
-                color: Colors.cyan,
+                color: Colors.tealAccent,
               )
             ],
           ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import './database/db_handler.dart';
+import './providers/chats_provider.dart';
 import './providers/user_provider.dart';
 // Screens
 import 'screens/home_screen.dart';
@@ -21,15 +22,17 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: ((_) => UserProvider())),
+        ChangeNotifierProvider(create: ((_) => ChatsProvider())),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         theme: theme.copyWith(
           colorScheme: theme.colorScheme.copyWith(
-            primary: const Color.fromRGBO(44, 95, 45, 1),
+            // primary: const Color.fromRGBO(44, 95, 45, 1),
             // secondary: const Color.fromRGBO(255, 180, 0, 1),
-            secondary: Colors.deepOrange,
+            primary: Colors.teal,
+            secondary: Colors.green,
           ),
         ),
         home: FutureBuilder<List>(

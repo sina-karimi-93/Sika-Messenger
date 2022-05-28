@@ -78,6 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
+          const SizedBox(height: 10),
           if (navigation["privates"]) const PrivateChats(),
           if (navigation["channels"]) const Channels(),
         ],

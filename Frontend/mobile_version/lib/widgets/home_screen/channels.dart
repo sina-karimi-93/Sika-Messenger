@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_version/screens/channel_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/user_provider.dart';
 import '../../providers/channels_provider.dart';
+import './channel_item.dart';
 
 class Channels extends StatelessWidget {
   const Channels({Key? key}) : super(key: key);
@@ -24,7 +26,19 @@ class Channels extends StatelessWidget {
           );
         } else if (snapshot.connectionState == ConnectionState.done) {
           return Expanded(
-            child: Text(""),
+            child: ListView.builder(
+              itemCount: channelsProvider.channels.length,
+              itemBuilder: ((context, index) {
+                return ChannelItem(
+                  id: channelsProvider.channels[index].id,
+                  channelName: channelsProvider.channels[index].channelName,
+                  lastMessage:
+                      channelsProvider.channels[index].messages.last.message,
+                  lastMessageTime:
+                      channelsProvider.channels[index].messages.last.createDate,
+                );
+              }),
+            ),
           );
         }
 

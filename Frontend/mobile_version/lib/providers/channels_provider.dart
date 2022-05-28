@@ -58,4 +58,14 @@ class ChannelsProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Channel getChannelById(String id) {
+    /*
+    This method gets an id and return a channel which its id is match
+    with the id comes from arguments.
+    */
+    final Channel channel =
+        _channels.where((element) => element.id == id).first;
+    return channel;
+  }
 }

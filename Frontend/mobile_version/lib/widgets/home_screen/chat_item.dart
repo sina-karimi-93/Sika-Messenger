@@ -35,59 +35,49 @@ class ChatItem extends StatelessWidget {
       future: getOwnerName(owner, user.email),
       builder: (ctx, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          return Column(
-            children: [
-              const SizedBox(height: 8),
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 7, horizontal: 20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(1),
-                    bottomLeft: Radius.circular(1),
-                    topLeft: Radius.circular(50),
-                    bottomRight: Radius.circular(50),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      spreadRadius: 1,
-                      blurRadius: 4,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ],
+          return Container(
+            margin: const EdgeInsets.symmetric(vertical: 7, horizontal: 20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: const BorderRadius.only(
+                topRight: Radius.circular(1),
+                bottomLeft: Radius.circular(1),
+                topLeft: Radius.circular(50),
+                bottomRight: Radius.circular(50),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  spreadRadius: 1,
+                  blurRadius: 4,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
-                child: ListTile(
-                  onTap: () {},
-                  // User profile Picture
-                  leading: CircleAvatar(
-                    backgroundColor: Theme.of(context).colorScheme.secondary,
-                    child:
-                        const Icon(Icons.person, color: Colors.white, size: 30),
-                  ),
-                  // User full name
-                  title: Text(
-                    snapshot.data.toString(),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                  // User last message
-                  subtitle: Text(
-                    lastMessage,
-                    softWrap: true,
-                    maxLines: 1,
-                  ),
-                  // User last message time
-                  trailing: Text(
-                      "${DateFormat.E().format(DateTime.parse(lastMessageTime))} ${DateFormat.Hm().format(DateTime.parse(lastMessageTime))}"),
+              ],
+            ),
+            child: ListTile(
+              onTap: () {},
+              // User profile Picture
+              leading: CircleAvatar(
+                backgroundColor: Theme.of(context).colorScheme.secondary,
+                child: const Icon(Icons.person, color: Colors.white, size: 30),
+              ),
+              // User full name
+              title: Text(
+                snapshot.data.toString(),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
                 ),
               ),
-              // const Padding(
-              //   padding: EdgeInsets.symmetric(horizontal: 20),
-              //   child: Divider(),
-              // )
-            ],
+              // User last message
+              subtitle: Text(
+                lastMessage,
+                softWrap: true,
+                maxLines: 1,
+              ),
+              // User last message time
+              trailing: Text(
+                  "${DateFormat.E().format(DateTime.parse(lastMessageTime))} ${DateFormat.Hm().format(DateTime.parse(lastMessageTime))}"),
+            ),
           );
         }
         return Padding(

@@ -76,7 +76,7 @@ class MyApp extends StatelessWidget {
         routes: {
           AuthScreen.routeName: ((context) => const AuthScreen()),
           HomeScreen.routeName: ((context) => const HomeScreen()),
-          ChannelScreen.routeName: ((context) => ChannelScreen()),
+          ChannelScreen.routeName: ((context) => const ChannelScreen()),
         },
       ),
     );

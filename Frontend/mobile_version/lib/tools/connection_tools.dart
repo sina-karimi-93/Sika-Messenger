@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:web_socket_channel/io.dart' as ws;
 
 String convertToBase64(String email, String password) {
   /*
@@ -67,4 +68,18 @@ Future<dynamic> loginUser(String email, String password) async {
   };
   final response = await http.post(loginUrl, headers: headers);
   return json.decode(response.body);
+}
+
+Stream<dynamic> connectToWebSocket(
+    String url, Map<String, dynamic> userCredential) {
+  /*
+  This method stablish a socket connection with the desired websocket and return
+  the instance of the IOWebSocketChannel
+  */
+  final headers = {
+    "authorization": convertToBase64(userCredential["email"], "1111")
+  };
+  final Uri uri = Uri.parse("ws://192.168.1.106:8001$url");
+  final connection = ws.IOWebSocketChannel.connect(uri, headers: headers);
+  return connection.stream;
 }

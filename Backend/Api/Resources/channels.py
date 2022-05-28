@@ -313,11 +313,6 @@ class Channels:
 
         try:
             await ws.accept()
-            await ws.send_media({
-                "title" : "ok",
-                "description": f"Connected to {channel_id}"
-                })
-
             user = req.user
             self._add_new_thread(ws, user["_id"])
 
@@ -327,7 +322,7 @@ class Channels:
                 if req.is_channel_auth == True:
                     self.message = new_message
                     self.new_message_date = datetime.now()
-                    self._add_new_message(req.channel, new_message, user)
+                    # self._add_new_message(req.channel, new_message, user)
                     sleep(0.1)
 
 

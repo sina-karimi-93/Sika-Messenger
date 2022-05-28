@@ -314,15 +314,15 @@ class Channels:
         try:
             await ws.accept()
             user = req.user
-            self._add_new_thread(ws, user["_id"])
+            self._add_new_thread(ws, user["_id"], channel_id)
 
             while True:
                 new_message = await ws.receive_text()
                 # cheks whether the user is owner or admin
                 if req.is_channel_auth == True:
                     self.message = new_message
+                    self._add_new_message(req.channel, new_message, user)
                     self.new_message_date = datetime.now()
-                    # self._add_new_message(req.channel, new_message, user)
                     sleep(0.1)
 
 
@@ -373,7 +373,7 @@ class Channels:
         sending_data_thread = Thread(target=self._async_bridge, args=(ws, user_id))
         sending_data_thread.start()
 
-    def _async_bridge(self, ws:WebSocket , user_id:ObjectId)-> None:
+    def _async_bridge(self, ws:WebSocket , user_id:ObjectId, channel_id:str)-> None:
         """
         This method is a bridge between an async function (_send_message) and
         a thread (_add_new_thread) in websocket. As we can not define an async
@@ -388,10 +388,33 @@ class Channels:
         """
 
         loop = asyncio.new_event_loop()
-        loop.run_until_complete(self._send_message(ws, user_id))
+        loop.run_until_complete(self._send_message(ws, user_id, channel_id))
         loop.close()
 
-    async def _send_message(self, ws: WebSocket, user_id:ObjectId)->None:
+    def _get_last_message(self, channel_id:str)->dict:
+        """
+        This method returns the latest message in a channel.
+        628e0bc8a92a88c0ded1a430
+        """
+
+        with Database(HOST,PORT,DB_NAME,'channels')as db:
+            db:Database
+
+            last_message = db.get_record(
+                query={"_id":ObjectId(channel_id)},
+                projection={
+                    "_id":0,
+                    "channel_name":0,
+                    "owner":0,
+                    "create_date":0,
+                    "admins":0,
+                    "members":0,
+                    "messages":{"$slice":-1}
+                })[0]
+        return last_message
+
+
+    async def _send_message(self, ws: WebSocket, user_id:ObjectId, channel_id:str)->None:
         """
         This method is responsible for sending new messages to
         the users. First it define current time. Then in a loop
@@ -413,7 +436,9 @@ class Channels:
         now_date = datetime.now()
         while self.online_users[user_id]:
             if now_date < self.new_message_date:
-                await ws.send_text(self.message)
+                last_message = self._get_last_message(channel_id)
+                last_message = ApiTools.prepare_data_before_send(last_message)
+                await ws.send_media(last_message)
                 now_date = self.new_message_date
             sleep(0.1)
 

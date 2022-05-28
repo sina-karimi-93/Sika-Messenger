@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import './database/db_handler.dart';
 import './providers/chats_provider.dart';
 import './providers/user_provider.dart';
+import './providers/channels_provider.dart';
 // Screens
 import 'screens/home_screen.dart';
 import 'screens/auth_screen.dart';
@@ -23,6 +24,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: ((_) => UserProvider())),
         ChangeNotifierProvider(create: ((_) => ChatsProvider())),
+        ChangeNotifierProvider(create: ((_) => ChannelsProvider())),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

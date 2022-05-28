@@ -16,6 +16,6 @@ class Channel {
   final String owner;
   final String createDate;
   final List<Message> messages;
-  final List<String> admins;
-  final List<String> members;
+  final List<dynamic> admins;
+  final List<dynamic> members;
 }

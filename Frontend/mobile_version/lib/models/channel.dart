@@ -4,6 +4,7 @@ class Channel {
   Channel({
     required this.id,
     required this.channelName,
+    required this.description,
     required this.owner,
     required this.createDate,
     required this.messages,
@@ -13,6 +14,7 @@ class Channel {
 
   final String id;
   final String channelName;
+  final String description;
   final String owner;
   final String createDate;
   final List<Message> messages;

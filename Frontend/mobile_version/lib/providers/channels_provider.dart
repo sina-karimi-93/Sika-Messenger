@@ -17,6 +17,7 @@ class ChannelsProvider with ChangeNotifier {
     for (Map<String, dynamic> channel in userChannels) {
       final String id = channel["_id"]["\$oid"];
       final String channelName = channel["channel_name"];
+      final String description = channel["description"];
       final String owner = channel["owner"]["\$oid"];
       final String createDate = channel["create_date"]["\$date"];
 
@@ -38,6 +39,7 @@ class ChannelsProvider with ChangeNotifier {
         Channel(
           id: id,
           channelName: channelName,
+          description: description,
           owner: owner,
           createDate: createDate,
           messages: messages,
@@ -75,13 +77,13 @@ class ChannelsProvider with ChangeNotifier {
     /*
         This method adds new message to a specific channel.
         */
-    final new_message = Message(
+    final newMessage = Message(
         id: channelId, message: message, owner: owner, createDate: createDate);
     _channels
         .where((element) => element.id == channelId)
         .first
         .messages
-        .add(new_message);
+        .add(newMessage);
   }
 
   ws.IOWebSocketChannel connectToChannelSocket(

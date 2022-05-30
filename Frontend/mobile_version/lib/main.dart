@@ -34,8 +34,8 @@ class MyApp extends StatelessWidget {
           colorScheme: theme.colorScheme.copyWith(
             // primary: const Color.fromRGBO(44, 95, 45, 1),
             // secondary: const Color.fromRGBO(255, 180, 0, 1),
-            primary: Colors.teal,
-            secondary: Colors.green,
+            primary: Colors.deepPurple,
+            secondary: Colors.pink.withAlpha(180),
           ),
         ),
         home: FutureBuilder<List>(

@@ -19,45 +19,57 @@ class ChannelScreenFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: isPortrait ? 20 : 50,
-        vertical: 10,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.primary,
+            spreadRadius: 0.1,
+            blurRadius: 0.1,
+          )
+        ],
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Form(
-              key: _formKey,
-              child: TextFormField(
-                controller: _messageController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  label: const Text(
-                    "Message",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: isPortrait ? 20 : 50,
+          vertical: 10,
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Form(
+                key: _formKey,
+                child: TextFormField(
+                  controller: _messageController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    label: const Text(
+                      "Message",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          IconButton(
-            onPressed: () {
-              final message = _messageController.value.text;
-              if (message.isNotEmpty) {
-                handler(messageCount);
-                socketConnection.sink.add(_messageController.value.text);
-                _messageController.clear();
-              }
-            },
-            icon: Icon(
-              Icons.send,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          )
-        ],
+            IconButton(
+              onPressed: () {
+                final message = _messageController.value.text;
+                if (message.isNotEmpty) {
+                  handler(messageCount);
+                  socketConnection.sink.add(_messageController.value.text);
+                  _messageController.clear();
+                }
+              },
+              icon: Icon(
+                Icons.send,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

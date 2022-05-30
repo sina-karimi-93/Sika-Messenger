@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ui';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
@@ -25,6 +24,7 @@ class ChannelScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     // getting routes args
     final routeArgs =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
@@ -41,6 +41,38 @@ class ChannelScreen extends StatelessWidget {
     final socketConnection = channelsProvider.connectToChannelSocket(
         channel.id, {"email": user.email, "password": user.password});
 
+    void showChannelInfo() {
+      showDialog(
+          context: context,
+          builder: (ctx) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(40),
+              ),
+              content: Container(
+                width: size.width * 0.7,
+                height: size.height * 0.7,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      channel.channelName,
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          });
+    }
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -52,13 +84,21 @@ class ChannelScreen extends StatelessWidget {
         title: Text(channel.channelName),
         actions: [
           IconButton(
-              onPressed: () => moveController(1),
-              icon: const Icon(Icons.arrow_downward))
+            onPressed: () => showChannelInfo(),
+            icon: const Icon(Icons.info_outline),
+          ),
+          IconButton(
+            onPressed: () => moveController(1),
+            icon: const Icon(Icons.arrow_downward),
+          ),
         ],
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.teal, Colors.greenAccent],
+              colors: [
+                Theme.of(context).colorScheme.primary,
+                Theme.of(context).colorScheme.secondary,
+              ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),

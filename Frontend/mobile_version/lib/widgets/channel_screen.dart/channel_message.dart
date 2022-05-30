@@ -21,7 +21,7 @@ class ChannelMessage extends StatelessWidget {
         Container(
           width: size.width * 0.7,
           margin: const EdgeInsets.all(15),
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: isOwner
@@ -53,6 +53,7 @@ class ChannelMessage extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w500,
+                  color: Colors.black87,
                 ),
               ),
               const SizedBox(height: 10),
@@ -65,6 +66,7 @@ class ChannelMessage extends StatelessWidget {
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.primary,
                         fontWeight: FontWeight.bold,
+                        fontSize: 13.5,
                       ),
                     ),
                   const SizedBox(width: 5),
@@ -74,6 +76,7 @@ class ChannelMessage extends StatelessWidget {
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.primary,
                         fontWeight: FontWeight.bold,
+                        fontSize: 13.5,
                       ),
                     ),
                   if (updateDate.isEmpty)
@@ -82,6 +85,7 @@ class ChannelMessage extends StatelessWidget {
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.primary,
                         fontWeight: FontWeight.bold,
+                        fontSize: 13.5,
                       ),
                     ),
                 ],

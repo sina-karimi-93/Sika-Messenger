@@ -17,5 +17,5 @@ class Channel {
   final Map<String, dynamic> owner;
   final String createDate;
   final List<Message> messages;
-  final List<Map<String, dynamic>> members;
+  final List<dynamic> members;
 }

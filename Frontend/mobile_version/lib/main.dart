@@ -32,10 +32,8 @@ class MyApp extends StatelessWidget {
         title: 'Flutter Demo',
         theme: theme.copyWith(
           colorScheme: theme.colorScheme.copyWith(
-            // primary: const Color.fromRGBO(44, 95, 45, 1),
-            // secondary: const Color.fromRGBO(255, 180, 0, 1),
             primary: Colors.deepPurple,
-            secondary: Colors.pink.withAlpha(180),
+            secondary: Colors.pink.withAlpha(210),
           ),
         ),
         home: FutureBuilder<List>(

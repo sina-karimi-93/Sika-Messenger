@@ -21,7 +21,7 @@ class ChannelMessage extends StatelessWidget {
         Container(
           width: size.width * 0.7,
           margin: const EdgeInsets.all(15),
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(15),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: isOwner
@@ -57,6 +57,7 @@ class ChannelMessage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
+              const Divider(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [

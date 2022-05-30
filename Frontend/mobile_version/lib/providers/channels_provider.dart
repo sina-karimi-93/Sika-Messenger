@@ -18,10 +18,8 @@ class ChannelsProvider with ChangeNotifier {
       final String id = channel["_id"]["\$oid"];
       final String channelName = channel["channel_name"];
       final String description = channel["description"];
-      final String owner = channel["owner"]["\$oid"];
+      final Map<String, dynamic> owner = channel["owner"];
       final String createDate = channel["create_date"]["\$date"];
-
-      final admins = channel["admins"];
       final members = channel["members"];
       final List<Message> messages = [];
       for (Map<String, dynamic> message in channel["messages"]) {

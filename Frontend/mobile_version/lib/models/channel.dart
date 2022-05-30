@@ -8,16 +8,14 @@ class Channel {
     required this.owner,
     required this.createDate,
     required this.messages,
-    required this.admins,
     required this.members,
   });
 
   final String id;
   final String channelName;
   final String description;
-  final String owner;
+  final Map<String, dynamic> owner;
   final String createDate;
   final List<Message> messages;
-  final List<dynamic> admins;
-  final List<dynamic> members;
+  final List<Map<String, dynamic>> members;
 }

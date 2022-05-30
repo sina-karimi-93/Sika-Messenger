@@ -156,24 +156,32 @@ class Channels:
 
         new_member_id = req.body_data["new_member_id"]
         channel = req.room
+        
 
-
-        with Database(HOST,PORT,DB_NAME,'channels') as db:
+        with Database(HOST,PORT,DB_NAME, 'users') as db:
             db:Database
 
-            # Add member to members array of the channel
-            db.update_record(
-                query={"_id":channel["_id"]},
-                updated_data={"$push":{"members":new_member_id}}
-            )
+            user  = db.get_record(
+                query={"_id":new_member_id},
+                projection={
+                    "password":0,
+                    "chats":0,
+                    "groups":0,
+                    "channels":0,
+                })
 
-            # Add channel id to the member channels array
+            # Add channel id to the members channels array
             db.update_record(
                 query={"_id":new_member_id},
                 updated_data={"$push":{"channels":channel["_id"]}},
-                collection_name='users',
             )
-
+            user["is_admin"] = False
+            # Add member to members array of the channel
+            db.update_record(
+                query={"_id":channel["_id"]},
+                updated_data={"$push":{"members":user}},
+                collection_name='channels'
+            )
         resp.media = {
             "title": "ok",
             "description": "New member has been successfully added to the channel."
@@ -206,7 +214,7 @@ class Channels:
                 updated_data={"$pull":{"members":member_id}}
             )
 
-            # Remove channel id from the member channels array
+            # Remove channel id from the members channels array
             db.update_record(
                 query={"_id":member_id},
                 updated_data={"$pull":{"channels":channel["_id"]}},
@@ -233,23 +241,19 @@ class Channels:
         # Check whether the applicant is owner of the channel or not
         if req.is_owner:
             
-            new_admin_id = req.body_data["new_admin_id"]
+            member_id = req.body_data["member_id"]
             channel = req.room
 
             with Database(HOST, PORT, DB_NAME, 'channels') as db:
                 db: Database
 
-                # Remove member from channel members
                 db.update_record(
-                    query={"_id": channel["_id"]},
+                    query={
+                        "_id": channel["_id"], 
+                        "members": {"$elemMatch":{"_id":member_id}}
+                    },
                     updated_data={
-                        "$pull": {"members": new_admin_id}}
-                )
-                # Add member to channel admins
-                db.update_record(
-                    query={"_id": channel["_id"]},
-                    updated_data={
-                        "$push": {"admins": new_admin_id}}
+                        "$set": {"members.$.is_admin": True}}
                 )
                 resp.media = {
                     "title": "ok",
@@ -273,31 +277,29 @@ class Channels:
                 "admin_id : ObjectId
             }
         """
-        admin_id = req.body_data["admin_id"]
-        channel = req.room
-
         # Check whether the applicant is owner of the channel or not
         if req.is_owner:
+            
+            member_id = req.body_data["member_id"]
+            channel = req.room
+
             with Database(HOST, PORT, DB_NAME, 'channels') as db:
                 db: Database
 
-                # Add admin to channels members
                 db.update_record(
-                    query={"_id": channel["_id"]},
+                    query={
+                        "_id": channel["_id"], 
+                        "members": {"$elemMatch":{"_id":member_id}}
+                    },
                     updated_data={
-                        "$push": {"members": admin_id}}
-                )
-                # Remove admin from channels admins
-                db.update_record(
-                    query={"_id": channel["_id"]},
-                    updated_data={
-                        "$pull": {"admins": admin_id}}
+                        "$set": {"members.$.is_admin": False}}
                 )
                 resp.media = {
                     "title": "ok",
-                    "description": "Admin successfully became member."
+                    "description": "Member successfully became member."
                 }
                 return
+
         resp.media = {
             "title": "ok",
             "description": "You are not the owner of the channel."

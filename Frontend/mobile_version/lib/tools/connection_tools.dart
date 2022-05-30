@@ -70,6 +70,21 @@ Future<dynamic> loginUser(String email, String password) async {
   return json.decode(response.body);
 }
 
+Future<dynamic> getUserData(
+    String owner, Map<String, String> userCredential) async {
+  /*
+  This methods get user serverId and ask server to give user information.
+  */
+  print(owner);
+  final response = await apiInteraction("/user/get-user",
+      {"email": userCredential["email"], "password": "1111"}, "post",
+      body: {
+        "user_id": {"\$oid": owner}
+      });
+  final user = response["user"];
+  return user;
+}
+
 ws.IOWebSocketChannel connectToWebSocket(
     String url, Map<String, dynamic> userCredential) {
   /*

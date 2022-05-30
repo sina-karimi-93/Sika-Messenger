@@ -43,7 +43,6 @@ class ChannelsProvider with ChangeNotifier {
           owner: owner,
           createDate: createDate,
           messages: messages,
-          admins: admins,
           members: members,
         ),
       );

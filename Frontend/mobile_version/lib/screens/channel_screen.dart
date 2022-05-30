@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
+import '../tools/connection_tools.dart' as api;
 import '../../models/channel.dart';
 import '../providers/channels_provider.dart';
 import '../providers/user_provider.dart';
@@ -56,16 +57,28 @@ class ChannelScreen extends StatelessWidget {
                   color: Colors.white,
                 ),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       channel.channelName,
                       textAlign: TextAlign.start,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 20,
+                        fontSize: 24,
                         color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
+                    const SizedBox(height: 10),
+                    Text(
+                      channel.description,
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    const Divider(),
                   ],
                 ),
               ),

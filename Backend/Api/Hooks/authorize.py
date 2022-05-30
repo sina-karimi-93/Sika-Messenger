@@ -35,7 +35,7 @@ class Authorize:
 
             user_id = req.user["_id"]
 
-            if user_id == room["owner"]:
+            if user_id == room["owner"]["_id"]:
                 req.is_owner = True
                 req.room = room
                 return

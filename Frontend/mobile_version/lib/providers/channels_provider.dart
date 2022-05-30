@@ -1,11 +1,12 @@
 import 'package:flutter/widgets.dart';
 import 'package:mobile_version/models/message.dart';
+import 'package:web_socket_channel/io.dart' as ws;
 import '../tools/connection_tools.dart' as server;
 import '../models/channel.dart';
 
 class ChannelsProvider with ChangeNotifier {
   List<Channel> _channels = [];
-
+  var channelSocket;
   List<Channel> get channels {
     return [..._channels];
   }
@@ -81,5 +82,25 @@ class ChannelsProvider with ChangeNotifier {
         .first
         .messages
         .add(new_message);
+  }
+
+  ws.IOWebSocketChannel connectToChannelSocket(
+    String channelId,
+    Map<String, dynamic> userCredential,
+  ) {
+    channelSocket = server.connectToWebSocket("/user/channels/$channelId", {
+      "email": userCredential["email"],
+      "password": userCredential["password"]
+    });
+    return channelSocket;
+  }
+
+  void closeChannelSocket() {
+    /*
+    This method close the connection of the channel socket;
+    */
+    if (channelSocket != null) {
+      channelSocket.sink.close();
+    }
   }
 }

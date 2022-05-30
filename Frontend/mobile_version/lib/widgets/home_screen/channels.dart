@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_version/screens/channel_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/user_provider.dart';

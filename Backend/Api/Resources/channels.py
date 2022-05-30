@@ -326,7 +326,7 @@ class Channels:
 
 
         except falcon.WebSocketDisconnected as e:
-            print(e)
+            print("Connection Closed")
             self.online_users[user["_id"]] = False
             # This delay is necessary because it takes approximately 0.01 seconds
             # until a thread be killed by python. So after this delay we remove

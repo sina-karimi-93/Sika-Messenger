@@ -83,8 +83,107 @@ class ChannelsProvider with ChangeNotifier {
         .add(newMessage);
   }
 
-  void addMember(Map<String, String> userCredential, String memberId) {
-    /**/
+  void addMember(
+    Map<String, String> userCredential,
+    String memberId,
+  ) {
+    /*
+    This method adds new member to the channel.
+    
+    args:
+      userCredential
+      memberId
+    */
+  }
+
+  Future<void> removeMember(
+    Map<String, String> userCredential,
+    String channelId,
+    String memberId,
+  ) async {
+    /*
+    This method removes a member from the channel.
+    
+    args:
+      userCredential
+      memberId
+    */
+
+    final response = await server.apiInteraction(
+      "/user/channels/remove-member",
+      userCredential,
+      "patch",
+      body: {
+        "room_id": {"\$oid": channelId},
+        "member_id": {"\$oid": memberId},
+      },
+    );
+    if (response["title"] == "ok") {
+      final Channel channel = getChannelById(channelId);
+      channel.members
+          .removeWhere((element) => element["_id"]["\$oid"] == memberId);
+      notifyListeners();
+    }
+  }
+
+  Future<void> addAdmin(
+    Map<String, String> userCredential,
+    String channelId,
+    String memberId,
+  ) async {
+    /*
+    This method makes a member, admin.
+    args:
+      userCredential
+      memberId
+    */
+
+    final response = await server.apiInteraction(
+      "/user/channels/add-admin",
+      userCredential,
+      "patch",
+      body: {
+        "room_id": {"\$oid": channelId},
+        "member_id": {"\$oid": memberId},
+      },
+    );
+    if (response["title"] == "ok") {
+      final Channel channel = getChannelById(channelId);
+      channel.members
+          .where((element) => element["_id"]["\$oid"] == memberId)
+          .first["is_admin"] = true;
+      notifyListeners();
+    }
+  }
+
+  Future<void> removeAdmin(
+    Map<String, String> userCredential,
+    String channelId,
+    String memberId,
+  ) async {
+    /*
+    This method makes an admin, member.
+    args:
+      userCredential
+      memberId
+    */
+
+    final response = await server.apiInteraction(
+      "/user/channels/remove-admin",
+      userCredential,
+      "patch",
+      body: {
+        "room_id": {"\$oid": channelId},
+        "member_id": {"\$oid": memberId},
+      },
+    );
+    if (response["title"] == "ok") {
+      final Channel channel = getChannelById(channelId);
+      channel.members
+          .where((element) => element["_id"]["\$oid"] == memberId)
+          .first["is_admin"] = false;
+      notifyListeners();
+    }
   }
 
   ws.IOWebSocketChannel connectToChannelSocket(

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mobile_version/providers/channels_provider.dart';
+import 'package:mobile_version/providers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../models/channel.dart';
 
@@ -14,6 +17,8 @@ class ChannelDetailScreen extends StatelessWidget {
     final Size size = MediaQuery.of(context).size;
     final modalArgs =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final channelsProvider = Provider.of<ChannelsProvider>(context);
+    final user = Provider.of<UserProvider>(context, listen: false).user;
     final Channel channel = modalArgs["channel"];
     final bool isOwner = modalArgs["isOwner"];
     return Scaffold(
@@ -165,6 +170,7 @@ class ChannelDetailScreen extends StatelessWidget {
                       child: ListView.builder(
                           itemCount: channel.members.length,
                           itemBuilder: (ctx, index) {
+                            final member = channel.members[index];
                             return Column(
                               children: [
                                 Row(
@@ -181,24 +187,53 @@ class ChannelDetailScreen extends StatelessWidget {
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               30)),
-                                                  content: channel
-                                                              .members[index]
-                                                          ["is_admin"]
+                                                  content: member["is_admin"]
                                                       ? Text(
-                                                          "Do you want to remove ${channel.members[index]["name"]} from admins?")
+                                                          "Do you want to remove ${member["name"]} from admins?")
                                                       : Text(
-                                                          "Do you want to make ${channel.members[index]["name"]} admin?"),
+                                                          "Do you want to make ${member["name"]} admin?"),
                                                   actions: [
                                                     TextButton(
-                                                      onPressed: () =>
-                                                          Navigator.of(context)
-                                                              .pop(),
+                                                      onPressed: () {
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
                                                       child: const Text("No"),
                                                     ),
                                                     TextButton(
-                                                      onPressed: () =>
-                                                          Navigator.of(context)
-                                                              .pop(),
+                                                      onPressed: () async {
+                                                        if (channel
+                                                                .members[index]
+                                                            ["is_admin"]) {
+                                                          await channelsProvider
+                                                              .removeAdmin(
+                                                            {
+                                                              "email":
+                                                                  user.email,
+                                                              "password":
+                                                                  user.password
+                                                            },
+                                                            channel.id,
+                                                            member["_id"]
+                                                                ["\$oid"],
+                                                          );
+                                                        } else {
+                                                          await channelsProvider
+                                                              .addAdmin(
+                                                            {
+                                                              "email":
+                                                                  user.email,
+                                                              "password":
+                                                                  user.password
+                                                            },
+                                                            channel.id,
+                                                            member["_id"]
+                                                                ["\$oid"],
+                                                          );
+                                                        }
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
                                                       child: const Text("Yes"),
                                                     ),
                                                   ],
@@ -207,7 +242,7 @@ class ChannelDetailScreen extends StatelessWidget {
                                             }
                                           : null,
                                       child: Text(
-                                        channel.members[index]["name"],
+                                        member["name"],
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Theme.of(context)
@@ -217,8 +252,7 @@ class ChannelDetailScreen extends StatelessWidget {
                                         ),
                                       ),
                                     ),
-                                    if (channel.members[index]["is_admin"] ==
-                                        true)
+                                    if (member["is_admin"] == true)
                                       Text(
                                         "Admin",
                                         style: TextStyle(
@@ -228,9 +262,47 @@ class ChannelDetailScreen extends StatelessWidget {
                                               .secondary,
                                         ),
                                       ),
+                                    // Remove member
                                     if (isOwner)
                                       IconButton(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          showDialog(
+                                              context: context,
+                                              builder: (ctx) {
+                                                return AlertDialog(
+                                                  title: const Text("Warning"),
+                                                  content: Text(
+                                                      "Do you want to remove ${member["name"]}?"),
+                                                  actions: [
+                                                    TextButton(
+                                                      child: const Text("No"),
+                                                      onPressed: () {
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
+                                                    ),
+                                                    TextButton(
+                                                      child: const Text("Yes"),
+                                                      onPressed: () async {
+                                                        await channelsProvider
+                                                            .removeMember(
+                                                          {
+                                                            "email": user.email,
+                                                            "password":
+                                                                user.password
+                                                          },
+                                                          channel.id,
+                                                          member["_id"]
+                                                              ["\$oid"],
+                                                        );
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
+                                                    )
+                                                  ],
+                                                );
+                                              });
+                                        },
                                         icon: const Icon(
                                           Icons.delete,
                                           color: Colors.redAccent,

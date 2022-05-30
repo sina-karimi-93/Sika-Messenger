@@ -211,7 +211,7 @@ class Channels:
             # Remove member from members array of the channel
             db.update_record(
                 query={"_id":channel["_id"]},
-                updated_data={"$pull":{"members":member_id}}
+                updated_data={"$pull":{"members":{"_id":member_id}}}
             )
 
             # Remove channel id from the members channels array

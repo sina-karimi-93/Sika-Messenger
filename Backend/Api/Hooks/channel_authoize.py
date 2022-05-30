@@ -34,13 +34,13 @@ class ChannelAuthorize:
             user_id = req.user["_id"]
             req.channel = channel
 
-            if user_id == channel["owner"]:
+            if user_id == channel["owner"]["_id"]:
                 req.is_channel_auth = True
                 return
 
-            elif user_id in channel["admins"]:
-                req.is_channel_auth = True
-
+            for member in channel["members"]:
+                if user_id == member["_id"]:
+                    req.is_channel_auth = True
             else:
                 req.is_channel_auth = False
 

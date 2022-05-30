@@ -83,6 +83,10 @@ class ChannelsProvider with ChangeNotifier {
         .add(newMessage);
   }
 
+  void addMember(Map<String, String> userCredential, String memberId) {
+    /**/
+  }
+
   ws.IOWebSocketChannel connectToChannelSocket(
     String channelId,
     Map<String, dynamic> userCredential,
@@ -100,6 +104,7 @@ class ChannelsProvider with ChangeNotifier {
     */
     if (channelSocket != null) {
       channelSocket.sink.close();
+      channelSocket = null;
     }
   }
 }

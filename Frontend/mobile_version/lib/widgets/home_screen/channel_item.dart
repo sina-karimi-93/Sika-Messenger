@@ -21,7 +21,7 @@ class ChannelItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 7, horizontal: 20),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(
           topRight: Radius.circular(1),
@@ -33,7 +33,7 @@ class ChannelItem extends StatelessWidget {
           BoxShadow(
             spreadRadius: 1,
             blurRadius: 4,
-            color: Colors.cyan,
+            color: Theme.of(context).colorScheme.primary,
           ),
         ],
       ),
@@ -43,8 +43,8 @@ class ChannelItem extends StatelessWidget {
               .pushNamed(ChannelScreen.routeName, arguments: {"id": id});
         },
         // User profile Picture
-        leading: const CircleAvatar(
-          backgroundColor: Colors.cyan,
+        leading: CircleAvatar(
+          backgroundColor: Theme.of(context).colorScheme.secondary,
           child: Icon(Icons.person, color: Colors.white, size: 30),
         ),
         // User full name

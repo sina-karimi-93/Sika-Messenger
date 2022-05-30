@@ -9,6 +9,7 @@ import './providers/channels_provider.dart';
 import 'screens/home_screen.dart';
 import 'screens/auth_screen.dart';
 import 'screens/channel_screen.dart';
+import './screens/channel_detail_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -75,6 +76,7 @@ class MyApp extends StatelessWidget {
           AuthScreen.routeName: ((context) => const AuthScreen()),
           HomeScreen.routeName: ((context) => const HomeScreen()),
           ChannelScreen.routeName: ((context) => ChannelScreen()),
+          ChannelDetailScreen.routeName: ((context) => ChannelDetailScreen()),
         },
       ),
     );

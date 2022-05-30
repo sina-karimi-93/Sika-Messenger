@@ -9,7 +9,6 @@ class ChannelScreenFooter extends StatelessWidget {
     required this.messageCount,
   }) : super(key: key);
 
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _messageController = TextEditingController();
 
   final IOWebSocketChannel socketConnection;
@@ -38,18 +37,16 @@ class ChannelScreenFooter extends StatelessWidget {
         child: Row(
           children: [
             Expanded(
-              child: Form(
-                key: _formKey,
-                child: TextFormField(
-                  controller: _messageController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    label: const Text(
-                      "Message",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+              child: TextFormField(
+                controller: _messageController,
+                keyboardType: TextInputType.visiblePassword,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  label: const Text(
+                    "Message",
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
               ),

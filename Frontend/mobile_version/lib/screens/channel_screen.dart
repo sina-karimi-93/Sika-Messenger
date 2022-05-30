@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
-import '../tools/connection_tools.dart' as api;
+import './channel_detail_screen.dart';
+
 import '../../models/channel.dart';
 import '../providers/channels_provider.dart';
 import '../providers/user_provider.dart';
@@ -16,10 +16,10 @@ class ChannelScreen extends StatelessWidget {
 
   ChannelScreen({Key? key}) : super(key: key);
   final ScrollController scrollController = ScrollController();
-
+  var socketConnection;
   void moveController(int messageCount) {
     scrollController.position.animateTo(
-        scrollController.position.maxScrollExtent + messageCount * 4,
+        scrollController.position.maxScrollExtent + messageCount * 10,
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeInOut);
   }
@@ -39,206 +39,11 @@ class ChannelScreen extends StatelessWidget {
     final Channel channel = channelsProvider.getChannelById(channelId);
 
     final bool isOwner = channel.owner["_id"]["\$oid"] == user.serverId;
-
-    final socketConnection = channelsProvider.connectToChannelSocket(
+    // print(channelsProvider.channelSocket);
+    // if (channelsProvider.channelSocket == null) {
+    socketConnection = channelsProvider.connectToChannelSocket(
         channel.id, {"email": user.email, "password": user.password});
-
-    void showChannelInfo() {
-      showDialog(
-          context: context,
-          builder: (ctx) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(40),
-              ),
-              content: Container(
-                width: size.width * 0.8,
-                height: size.height * 0.7,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      channel.channelName,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      channel.description,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    const Divider(),
-                    const SizedBox(height: 10),
-                    // Owner
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              "Owner",
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(width: 5),
-                            Icon(
-                              Icons.person,
-                              color: Theme.of(context).colorScheme.primary,
-                            )
-                          ],
-                        ),
-                        Text(
-                          channel.owner["name"],
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.secondary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              "Create Date",
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(width: 5),
-                            Icon(
-                              Icons.calendar_month_outlined,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                          ],
-                        ),
-                        Text(
-                          DateFormat.yMMMd()
-                              .format(DateTime.parse(channel.createDate)),
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.secondary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Divider(),
-                    const SizedBox(height: 10),
-                    // Members
-                    Text(
-                      "Members",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Expanded(
-                      child: ListView.builder(
-                          itemCount: channel.members.length,
-                          itemBuilder: (ctx, index) {
-                            return Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    if (isOwner)
-                                      IconButton(
-                                        onPressed: () {},
-                                        icon: const Icon(
-                                          Icons.delete,
-                                          color: Colors.red,
-                                        ),
-                                      ),
-                                    if (channel.members[index]["is_admin"] ==
-                                        true)
-                                      Text(
-                                        "@",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .secondary,
-                                        ),
-                                      ),
-                                    GestureDetector(
-                                      onLongPress: isOwner
-                                          ? () {
-                                              showDialog(
-                                                context: context,
-                                                builder: (ctx) => AlertDialog(
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              30)),
-                                                  content: channel
-                                                              .members[index]
-                                                          ["is_admin"]
-                                                      ? Text(
-                                                          "Do you want to remove ${channel.members[index]["name"]} from admin?")
-                                                      : Text(
-                                                          "Do you want to make ${channel.members[index]["name"]} admin?"),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () =>
-                                                          Navigator.of(context)
-                                                              .pop(),
-                                                      child: const Text("No"),
-                                                    ),
-                                                    TextButton(
-                                                      onPressed: () =>
-                                                          Navigator.of(context)
-                                                              .pop(),
-                                                      child: const Text("Yes"),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            }
-                                          : null,
-                                      child: Text(
-                                        channel.members[index]["name"],
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const Divider(),
-                              ],
-                            );
-                          }),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          });
-    }
+    // }
 
     return Scaffold(
       appBar: AppBar(
@@ -249,7 +54,9 @@ class ChannelScreen extends StatelessWidget {
               Navigator.of(context).pop();
             }),
         title: GestureDetector(
-          onTap: () => showChannelInfo(),
+          onTap: () => Navigator.of(context).pushNamed(
+              ChannelDetailScreen.routeName,
+              arguments: {"channel": channel, "isOwner": isOwner}),
           child: Text(channel.channelName),
         ),
         actions: [

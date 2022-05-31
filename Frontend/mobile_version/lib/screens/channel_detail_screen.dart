@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:mobile_version/providers/channels_provider.dart';
-import 'package:mobile_version/providers/user_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+
+import '../providers/channels_provider.dart';
+import '../providers/user_provider.dart';
 
 import '../models/channel.dart';
 
@@ -18,7 +19,8 @@ class ChannelDetailScreen extends StatelessWidget {
     final modalArgs =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final channelsProvider = Provider.of<ChannelsProvider>(context);
-    final user = Provider.of<UserProvider>(context, listen: false).user;
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final user = userProvider.user;
     final Channel channel = modalArgs["channel"];
     final bool isOwner = modalArgs["isOwner"];
     return Scaffold(
@@ -316,7 +318,97 @@ class ChannelDetailScreen extends StatelessWidget {
                           }),
                     ),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        final users = await userProvider.getAllUsers(
+                          {"email": user.email, "password": user.password},
+                        );
+                        showModalBottomSheet(
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(50),
+                                topRight: Radius.circular(50),
+                              ),
+                            ),
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary,
+                            context: context,
+                            builder: (ctx) {
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 30),
+                                child: users.isEmpty
+                                    ? const Text(
+                                        "Something went wrong! Couldn't find any user.")
+                                    : ListView.builder(
+                                        itemCount: users.length,
+                                        itemBuilder: (ctx, index) {
+                                          final bool isUserExists =
+                                              channelsProvider
+                                                  .checkMemberExists(
+                                                      channel,
+                                                      users[index]["_id"]
+                                                          ["\$oid"]);
+                                          return Column(
+                                            children: [
+                                              if (!isUserExists)
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        const Icon(
+                                                          Icons.person,
+                                                          color: Colors.white,
+                                                        ),
+                                                        const SizedBox(
+                                                            width: 5),
+                                                        Text(
+                                                          users[index]["name"],
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    IconButton(
+                                                      onPressed: () async {
+                                                        await channelsProvider
+                                                            .addMember(
+                                                                {
+                                                              "email":
+                                                                  user.email,
+                                                              "password":
+                                                                  user.password,
+                                                            },
+                                                                channel.id,
+                                                                users[index]
+                                                                        ["_id"]
+                                                                    ["\$oid"]);
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
+                                                      icon: const Icon(
+                                                        Icons.add,
+                                                        color: Colors.white,
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              if (!isUserExists)
+                                                const Divider(
+                                                    color: Colors.white),
+                                            ],
+                                          );
+                                        }),
+                              );
+                            });
+                      },
                       child: Text(
                         "Add new member",
                         style: TextStyle(

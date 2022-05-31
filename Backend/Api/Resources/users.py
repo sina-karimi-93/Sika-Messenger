@@ -1,3 +1,4 @@
+from pprint import pprint
 from bson import ObjectId
 import falcon
 from datetime import datetime
@@ -16,6 +17,23 @@ class Users:
 
     def __str__(self) -> str:
         return "Users"
+
+    @falcon.before(Authenticate())
+    async def on_get(self, req:Request, resp:Response)-> None:
+        """
+        This method return all users from the database.
+        """
+
+        with Database(HOST, PORT, DB_NAME, 'users') as db:
+            db:Database
+
+            users = tuple(db.get_record({}, {"_id":1, "name":1}, find_one=False))
+        users = ApiTools.prepare_data_before_send(users)
+        resp.media = {
+            "title":"ok",
+            "description":"All users",
+            "users":users
+        }
 
     @falcon.before(Authenticate())
     async def on_post(self, req:Request, resp:Response)-> None:

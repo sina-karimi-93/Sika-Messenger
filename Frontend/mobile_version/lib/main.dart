@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
         theme: theme.copyWith(
           colorScheme: theme.colorScheme.copyWith(
             primary: Colors.deepPurple,
-            secondary: Colors.pink.withAlpha(210),
+            secondary: Colors.pink,
           ),
         ),
         home: FutureBuilder<List>(

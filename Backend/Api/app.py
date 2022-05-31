@@ -8,6 +8,7 @@ from Api.Resources.channels import Channels
 app = falcon.asgi.App()
 
 
+app.add_route("/users", Users())
 app.add_route("/user/get-user", Users())
 app.add_route("/user/login", Users(), suffix="login")
 app.add_route("/user/signup", Users(), suffix="signup")

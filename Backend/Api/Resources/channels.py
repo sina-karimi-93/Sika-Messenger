@@ -150,11 +150,11 @@ class Channels:
         Request body:
             {
                 "room_id" : ObjectId,
-                "new_member_id : ObjectId
+                "member_id : ObjectId
             }
         """
 
-        new_member_id = req.body_data["new_member_id"]
+        member_id = req.body_data["member_id"]
         channel = req.room
         
 
@@ -162,17 +162,18 @@ class Channels:
             db:Database
 
             user  = db.get_record(
-                query={"_id":new_member_id},
+                query={"_id":member_id},
                 projection={
                     "password":0,
                     "chats":0,
                     "groups":0,
                     "channels":0,
                 })
+            print(user)
 
             # Add channel id to the members channels array
             db.update_record(
-                query={"_id":new_member_id},
+                query={"_id":member_id},
                 updated_data={"$push":{"channels":channel["_id"]}},
             )
             user["is_admin"] = False
@@ -182,9 +183,11 @@ class Channels:
                 updated_data={"$push":{"members":user}},
                 collection_name='channels'
             )
+        user = ApiTools.prepare_data_before_send(user)
         resp.media = {
             "title": "ok",
-            "description": "New member has been successfully added to the channel."
+            "description": "New member has been successfully added to the channel.",
+            "user":user
         }
 
     @falcon.before(Authorize())

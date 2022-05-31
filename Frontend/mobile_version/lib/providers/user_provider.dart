@@ -83,4 +83,21 @@ class UserProvider with ChangeNotifier {
       phoneNumber: 'phoneNumber',
     );
   }
+
+  Future<List<dynamic>> getAllUsers(
+    Map<String, String> userCredential,
+  ) async {
+    /*
+    This method gets all users from server.
+
+    args:
+      userCredential
+    */
+    final response =
+        await server.apiInteraction("/users", userCredential, "get");
+    if (response["title"] == "ok") {
+      return response["users"];
+    }
+    return [];
+  }
 }

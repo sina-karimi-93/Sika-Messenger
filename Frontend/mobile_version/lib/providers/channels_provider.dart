@@ -83,10 +83,11 @@ class ChannelsProvider with ChangeNotifier {
         .add(newMessage);
   }
 
-  void addMember(
+  Future<void> addMember(
     Map<String, String> userCredential,
+    String channelId,
     String memberId,
-  ) {
+  ) async {
     /*
     This method adds new member to the channel.
     
@@ -94,6 +95,21 @@ class ChannelsProvider with ChangeNotifier {
       userCredential
       memberId
     */
+
+    final response = await server.apiInteraction(
+      "/user/channels/add-member",
+      userCredential,
+      "patch",
+      body: {
+        "room_id": {"\$oid": channelId},
+        "member_id": {"\$oid": memberId},
+      },
+    );
+    if (response["title"] == "ok") {
+      final Channel channel = getChannelById(channelId);
+      channel.members.add(response["user"]);
+      notifyListeners();
+    }
   }
 
   Future<void> removeMember(
@@ -205,5 +221,24 @@ class ChannelsProvider with ChangeNotifier {
       channelSocket.sink.close();
       channelSocket = null;
     }
+  }
+
+  bool checkMemberExists(Channel channel, String memberId) {
+    /*
+    This method checks whether a user is exists in channel members or not.
+
+    args:
+      Channel channel
+      String memberId
+    */
+    if (channel.owner["_id"]["\$oid"] == memberId) {
+      return true;
+    }
+    for (var user in channel.members) {
+      if (user["_id"]["\$oid"] == memberId) {
+        return true;
+      }
+    }
+    return false;
   }
 }

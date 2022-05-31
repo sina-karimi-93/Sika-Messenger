@@ -41,8 +41,6 @@ class ChannelScreen extends StatelessWidget {
     final bool isOwner = channel.owner["_id"]["\$oid"] == user.serverId;
     final bool isAdmin =
         channelsProvider.checkMemberIsAdmin(channel, user.serverId);
-    print(isOwner);
-    print(isAdmin);
     // print(channelsProvider.channelSocket);
     // if (channelsProvider.channelSocket == null) {
     socketConnection = channelsProvider.connectToChannelSocket(

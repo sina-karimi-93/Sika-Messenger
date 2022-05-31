@@ -122,7 +122,8 @@ class Channels:
                 # remove channel id from members channels array
                 db.update_record(
                     query={"_id":{"$in":all_channel_members}},
-                    updated_data = {"$pull":{"channels":channel["_id"]}}
+                    updated_data = {"$pull":{"channels":channel["_id"]}},
+                    update_one=False,
                 ) 
 
                 # remove the channel from channels collection   
@@ -131,7 +132,7 @@ class Channels:
                     collection_name='channels'
                 )
                 resp.media = {
-                    "title": "error",
+                    "title": "ok",
                     "description": "Channel has been successfully deleted."
                 }
                 return

@@ -152,7 +152,15 @@ class ApiTools:
                 "channels": owner["channels"]
             },
             "create_date": datetime.now(),
-            "messages": [],
+            "messages": [
+                {
+                    "_id":ObjectId(),
+                    "message": f"Welcome to {name}",
+                    "owner":owner["_id"],
+                    "create_date":datetime.now(),
+                    "update_date":None,
+                }
+            ],
             "members": [],
             "description":description,
         }

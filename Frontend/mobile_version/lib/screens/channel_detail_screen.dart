@@ -199,8 +199,9 @@ class ChannelDetailScreen extends StatelessWidget {
                                               "password": user.password
                                             },
                                           );
-                                          if (result) {
-                                            Navigator.of(context)
+                                          if (result == true) {
+                                            print("Deleted!");
+                                            await Navigator.of(context)
                                                 .pushReplacementNamed(
                                                     HomeScreen.routeName);
                                           } else {

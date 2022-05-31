@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_version/screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
@@ -156,6 +157,83 @@ class ChannelDetailScreen extends StatelessWidget {
                       ],
                     ),
                     const Divider(),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                          )),
+                        ),
+                        onPressed: () {
+                          showDialog(
+                              context: context,
+                              builder: (ctx) {
+                                return AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
+                                  title: const Text(
+                                    "Warning",
+                                    style: TextStyle(
+                                      color: Colors.amber,
+                                    ),
+                                  ),
+                                  content: const Text(
+                                      "Are you sure you want to remove this channel?"),
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(),
+                                        child: const Text("No")),
+                                    TextButton(
+                                        onPressed: () async {
+                                          final bool result =
+                                              await channelsProvider
+                                                  .removeChannel(
+                                            channel,
+                                            {
+                                              "email": user.email,
+                                              "password": user.password
+                                            },
+                                          );
+                                          if (result) {
+                                            Navigator.of(context)
+                                                .pushReplacementNamed(
+                                                    HomeScreen.routeName);
+                                          } else {
+                                            showDialog(
+                                                context: context,
+                                                builder: (ctx) {
+                                                  return const AlertDialog(
+                                                    title: Text(
+                                                      "Error",
+                                                      style: TextStyle(
+                                                          color:
+                                                              Colors.redAccent),
+                                                    ),
+                                                    content: Text(
+                                                        "Something went wrong!"),
+                                                  );
+                                                });
+                                          }
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text("Yes")),
+                                  ],
+                                );
+                              });
+                        },
+                        child: const Text(
+                          "Delete Channel",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 10),
                     // Members
                     Text(

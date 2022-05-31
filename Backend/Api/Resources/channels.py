@@ -110,7 +110,6 @@ class Channels:
 
             all_channel_members = [
                 user["_id"], 
-                *channel["admins"],
                 *channel["members"]
                 ]
 

@@ -56,9 +56,11 @@ class ChannelScreen extends StatelessWidget {
               Navigator.of(context).pop();
             }),
         title: GestureDetector(
-          onTap: () => Navigator.of(context).pushNamed(
-              ChannelDetailScreen.routeName,
-              arguments: {"channel": channel, "isOwner": isOwner}),
+          onTap: () {
+            channelsProvider.closeChannelSocket();
+            Navigator.of(context).pushNamed(ChannelDetailScreen.routeName,
+                arguments: {"channel": channel, "isOwner": isOwner});
+          },
           child: Text(channel.channelName),
         ),
         actions: [

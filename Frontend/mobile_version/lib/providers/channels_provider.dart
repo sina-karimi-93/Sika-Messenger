@@ -282,7 +282,28 @@ class ChannelsProvider with ChangeNotifier {
       "delete",
       body: body,
     );
-    print(response);
+    if (response["title"] == "ok") {
+      return true;
+    }
+    return false;
+  }
+
+  Future<bool> addChannel(
+    String name,
+    String description,
+    Map<String, String> userCredential,
+  ) async {
+    /*
+    This method adds new channel for the user.
+
+    args:
+      String name
+      String description
+      Map userCredential
+    */
+    final body = {"channel_name": name, "description": description};
+    final response = await server
+        .apiInteraction("/user/channels", userCredential, "post", body: body);
     if (response["title"] == "ok") {
       return true;
     }

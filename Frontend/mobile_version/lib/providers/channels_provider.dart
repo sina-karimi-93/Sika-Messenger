@@ -262,7 +262,10 @@ class ChannelsProvider with ChangeNotifier {
   }
 
   Future<bool> removeChannel(
-      /*
+    Channel channel,
+    Map<String, String> userCredential,
+  ) async {
+    /*
     This method send a request to server and ask for removing a channel with all
     its data.
 
@@ -270,10 +273,16 @@ class ChannelsProvider with ChangeNotifier {
       Channel channel
       Map userCredential
     */
-      Channel channel,
-      Map<String, String> userCredential) async {
-    final response =
-        await server.apiInteraction("/user/channels", userCredential, "delete");
+    final body = {
+      "room_id": {"\$oid": channel.id}
+    };
+    final response = await server.apiInteraction(
+      "/user/channels",
+      userCredential,
+      "delete",
+      body: body,
+    );
+    print(response);
     if (response["title"] == "ok") {
       return true;
     }

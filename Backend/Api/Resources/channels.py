@@ -108,34 +108,37 @@ class Channels:
             user = req.user
             channel = req.room
 
+            channel_members_ids = [
+                member["_id"] for member in channel["members"]
+            ]
             all_channel_members = [
                 user["_id"], 
-                *channel["members"]
+                *channel_members_ids
                 ]
+            print(all_channel_members)
+            # with Database(HOST, PORT,DB_NAME,'users') as db:
+            #     db:Database
 
-            with Database(HOST, PORT,DB_NAME,'users') as db:
-                db:Database
+            #     # remove channel id from members channels array
+            #     db.update_record(
+            #         query={"_id":{"$in":all_channel_members}},
+            #         updated_data = {"$pull":{"channels":channel["_id"]}}
+            #     ) 
 
-                # remove channel id from members channels array
-                db.update_record(
-                    query={"_id":{"$in":all_channel_members}},
-                    updated_data = {"$pull":{"channels":channel["_id"]}}
-                ) 
-
-                # remove the channel from channels collection   
-                db.delete_record(
-                    query={"_id":channel["_id"]},
-                    collection_name='channels'
-                )
-                resp.media = {
-                    "title": "ok",
-                    "description": "Channel has been successfully deleted."
-                }
-                return
-        resp.media = {
-            "title": "ok",
-            "description": "You are not the owner of the chennel."
-        }
+            #     # remove the channel from channels collection   
+            #     db.delete_record(
+            #         query={"_id":channel["_id"]},
+            #         collection_name='channels'
+            #     )
+            resp.media = {
+                "title": "error",
+                "description": "Channel has been successfully deleted."
+            }
+            return
+        # resp.media = {
+        #     "title": "error",
+        #     "description": "You are not the owner of the chennel."
+        # }
 
 
     @falcon.before(Authorize())

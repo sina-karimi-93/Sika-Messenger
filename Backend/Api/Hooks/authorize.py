@@ -26,7 +26,7 @@ class Authorize:
     async def __call__(self, req, res, resource, params) -> None:
 
         req.body_data = ApiTools.prepare_body_data(await req.stream.read())
-
+        print(req.body_data)
         collection_name = str(resource).lower()
         try:
             with Database(HOST, PORT, DB_NAME, collection_name) as db:

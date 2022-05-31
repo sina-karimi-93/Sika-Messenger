@@ -157,6 +157,7 @@ class ChannelDetailScreen extends StatelessWidget {
                       ],
                     ),
                     const Divider(),
+                    // Delete Channel
                     if (isOwner)
                       Align(
                         alignment: Alignment.centerRight,
@@ -200,7 +201,6 @@ class ChannelDetailScreen extends StatelessWidget {
                                               },
                                             );
                                             if (result == true) {
-                                              print("Deleted!");
                                               await Navigator.of(context)
                                                   .pushReplacementNamed(
                                                       HomeScreen.routeName);
@@ -229,6 +229,68 @@ class ChannelDetailScreen extends StatelessWidget {
                           },
                           child: const Text(
                             "Delete Channel",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    // Leave Channel
+                    if (!isOwner)
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50),
+                            )),
+                          ),
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (ctx) {
+                                  return AlertDialog(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(50),
+                                    ),
+                                    title: const Text(
+                                      "Warning",
+                                      style: TextStyle(
+                                        color: Colors.amber,
+                                      ),
+                                    ),
+                                    content: const Text(
+                                        "Are you sure you want to leave from this channel?"),
+                                    actions: [
+                                      TextButton(
+                                        child: const Text("No"),
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(),
+                                      ),
+                                      TextButton(
+                                        child: const Text("Yes"),
+                                        onPressed: () async {
+                                          await channelsProvider.leaveChannel(
+                                            {
+                                              "email": user.email,
+                                              "password": user.password
+                                            },
+                                            channel.id,
+                                            user.serverId,
+                                          );
+
+                                          await Navigator.of(context)
+                                              .pushReplacementNamed(
+                                                  HomeScreen.routeName);
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                });
+                          },
+                          child: const Text(
+                            "Leave Channel",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                             ),

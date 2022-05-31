@@ -112,6 +112,35 @@ class ChannelsProvider with ChangeNotifier {
     }
   }
 
+  Future<void> leaveChannel(
+    Map<String, String> userCredential,
+    String channelId,
+    String memberId,
+  ) async {
+    /*
+    This method removes a member from the channel.
+    
+    args:
+      userCredential
+      memberId
+    */
+
+    final response = await server.apiInteraction(
+      "/user/channels/leave-channel",
+      userCredential,
+      "patch",
+      body: {
+        "room_id": {"\$oid": channelId},
+        "member_id": {"\$oid": memberId},
+      },
+    );
+    if (response["title"] == "ok") {
+      _channels.removeWhere((element) => element.id == channelId);
+      print(_channels);
+      notifyListeners();
+    }
+  }
+
   Future<void> removeMember(
     Map<String, String> userCredential,
     String channelId,

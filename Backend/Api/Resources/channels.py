@@ -141,6 +141,41 @@ class Channels:
             "description": "You are not the owner of the chennel."
         }
 
+    async def on_patch_leave_channel(self, req:Request, resp:Response)->None:
+        """
+        This route stands for removing a member from a channel. This
+        method has not any authorization because every member of a channel
+        can leave channel any time he/she want.
+
+        Request body:
+            {
+                "room_id" : ObjectId,
+                "member_id : ObjectId
+            }
+        """
+
+        body = ApiTools.prepare_body_data(await req.stream.read())
+        
+        channel_id = body["room_id"]
+        member_id = body["member_id"]
+
+        with Database(HOST,PORT,DB_NAME,'channels') as db:
+            db:Database
+
+            db.update_record(
+                {"_id": channel_id},
+                {"$pull": {"members":{"_id": member_id}}}
+            )
+
+            db.update_record(
+                query={"_id": member_id},
+                updated_data={"$pull":{"channels":channel_id}},
+                collection_name="users"
+            )
+        resp.media = {
+            "title": "ok",
+            "description": "Member successfully leaved the channel",
+        }
 
     @falcon.before(Authorize())
     async def on_patch_add_member(self, req:Request, resp:Response)-> None:
@@ -210,7 +245,6 @@ class Channels:
 
         member_id = req.body_data["member_id"]
         channel = req.room
-
         with Database(HOST,PORT,DB_NAME,'channels') as db:
             db:Database
 

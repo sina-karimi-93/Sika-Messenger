@@ -154,14 +154,19 @@ class AppDrawer extends StatelessWidget {
             ),
           ),
           DrawerItem(
-            handler: logout,
-            title: "Logout",
-            icon: Icons.logout,
-          ),
-          DrawerItem(
             handler: newChannel,
             title: "Add New Channel",
             icon: Icons.newspaper,
+          ),
+          DrawerItem(
+            handler: newChannel,
+            title: "Add New Group",
+            icon: Icons.group_add_rounded,
+          ),
+          DrawerItem(
+            handler: logout,
+            title: "Logout",
+            icon: Icons.logout,
           ),
         ],
       ),

@@ -1,6 +1,7 @@
 import base64
 import bcrypt
 import json
+from pprint import pprint
 from bson import json_util
 from datetime import datetime
 from bson.objectid import ObjectId
@@ -129,7 +130,7 @@ class ApiTools:
 
         return new_group_document
 
-    def create_new_channel(name: str, owner: ObjectId) -> dict:
+    def create_new_channel(name: str, description:str, owner: dict) -> dict:
         """
         This method creates a dictionary which contains a channel
         information based on database channels collection schema.
@@ -142,13 +143,19 @@ class ApiTools:
         """
         new_channel_document = {
             "channel_name": name,
-            "owner": owner,
+            "owner": {
+                "_id": owner["_id"],
+                "name": owner["name"],
+                "email": owner["email"],
+                "phone_number": owner["phone_number"],
+                "groups": owner["groups"],
+                "channels": owner["channels"]
+            },
             "create_date": datetime.now(),
             "messages": [],
-            "admins": [],
-            "members": []
+            "members": [],
+            "description":description,
         }
-
         return new_channel_document
 
 

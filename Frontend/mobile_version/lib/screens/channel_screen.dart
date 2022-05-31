@@ -39,6 +39,10 @@ class ChannelScreen extends StatelessWidget {
     final Channel channel = channelsProvider.getChannelById(channelId);
 
     final bool isOwner = channel.owner["_id"]["\$oid"] == user.serverId;
+    final bool isAdmin =
+        channelsProvider.checkMemberIsAdmin(channel, user.serverId);
+    print(isOwner);
+    print(isAdmin);
     // print(channelsProvider.channelSocket);
     // if (channelsProvider.channelSocket == null) {
     socketConnection = channelsProvider.connectToChannelSocket(
@@ -105,7 +109,7 @@ class ChannelScreen extends StatelessWidget {
                       itemBuilder: ((context, index) {
                         return ChannelMessage(
                             channel.messages[index].message,
-                            isOwner,
+                            channel.messages[index].owner == user.serverId,
                             channel.messages[index].createDate,
                             channel.messages[index].updateDate);
                       }),
@@ -122,7 +126,7 @@ class ChannelScreen extends StatelessWidget {
                     itemBuilder: ((context, index) {
                       return ChannelMessage(
                           channel.messages[index].message,
-                          isOwner,
+                          channel.messages[index].owner == user.serverId,
                           channel.messages[index].createDate,
                           channel.messages[index].updateDate);
                     }),
@@ -130,7 +134,7 @@ class ChannelScreen extends StatelessWidget {
                 },
               ),
             ),
-            if (isOwner)
+            if (isOwner || isAdmin)
               ChannelScreenFooter(
                 socketConnection: socketConnection,
                 handler: moveController,

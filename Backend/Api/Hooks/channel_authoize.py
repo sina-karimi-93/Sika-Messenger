@@ -40,7 +40,10 @@ class ChannelAuthorize:
 
             for member in channel["members"]:
                 if user_id == member["_id"]:
-                    req.is_channel_auth = True
+                    if member["is_admin"]==True:
+                        req.is_channel_auth = True
+                        return
+
             else:
                 req.is_channel_auth = False
 

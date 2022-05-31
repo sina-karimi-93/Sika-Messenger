@@ -241,4 +241,23 @@ class ChannelsProvider with ChangeNotifier {
     }
     return false;
   }
+
+  bool checkMemberIsAdmin(Channel channel, String memberId) {
+    /*
+    This method check whether the member is admin or not.
+
+    args:
+      Channel channel
+      String memberId
+    */
+    for (var member in channel.members) {
+      if (member["_id"]["\$oid"] == memberId) {
+        if (member["is_admin"] == true) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
 }

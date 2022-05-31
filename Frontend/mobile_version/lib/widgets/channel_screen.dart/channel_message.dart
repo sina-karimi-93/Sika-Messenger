@@ -41,7 +41,9 @@ class ChannelMessage extends StatelessWidget {
               BoxShadow(
                 spreadRadius: 1,
                 blurRadius: 3,
-                color: Theme.of(context).colorScheme.primary,
+                color: isOwner
+                    ? Colors.purple
+                    : Theme.of(context).colorScheme.primary,
               )
             ],
           ),

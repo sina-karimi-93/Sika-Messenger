@@ -317,9 +317,9 @@ class Channels:
 
         try:
             await ws.accept()
-            print(req.headers)
             user = req.user
             self._add_new_thread(ws, user["_id"], channel_id)
+            print(req.is_channel_auth)
             while True:
                 new_message = await ws.receive_text()
                 # cheks whether the user is owner or admin

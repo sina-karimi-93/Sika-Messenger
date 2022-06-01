@@ -63,6 +63,7 @@ Future<dynamic> loginUser(String email, String password) async {
     password: user password
   */
   Uri loginUrl = Uri.http("192.168.1.106:8001", "/user/login");
+  // Uri loginUrl = Uri.http("10.0.2.2:8001", "/user/login");
   final Map<String, String> headers = {
     "authorization": convertToBase64(email, password)
   };
@@ -75,7 +76,6 @@ Future<dynamic> getUserData(
   /*
   This methods get user serverId and ask server to give user information.
   */
-  print(owner);
   final response = await apiInteraction("/user/get-user",
       {"email": userCredential["email"], "password": "1111"}, "post",
       body: {

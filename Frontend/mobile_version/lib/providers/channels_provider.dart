@@ -11,6 +11,14 @@ class ChannelsProvider with ChangeNotifier {
     return [..._channels];
   }
 
+  void emptyChannels() {
+    /*
+    This method removes all channels from _channels List.
+    This method usually calls when user logout.
+    */
+    _channels = [];
+  }
+
   List<Channel> _extractData(List<dynamic> userChannels) {
     final List<Channel> allChannels = [];
 

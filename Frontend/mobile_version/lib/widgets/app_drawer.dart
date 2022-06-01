@@ -25,6 +25,7 @@ class AppDrawer extends StatelessWidget {
       Logout user and redirect him/her to auth screen
       */
       await userProvider.logout(user.localId);
+      channelsProvider.emptyChannels();
       Navigator.of(context).pushReplacementNamed(AuthScreen.routeName);
     }
 

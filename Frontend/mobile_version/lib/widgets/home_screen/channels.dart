@@ -28,6 +28,7 @@ class Channels extends StatelessWidget {
             child: ListView.builder(
               itemCount: channelsProvider.channels.length,
               itemBuilder: ((context, index) {
+                print(channelsProvider.channels);
                 return ChannelItem(
                   id: channelsProvider.channels[index].id,
                   channelName: channelsProvider.channels[index].channelName,
